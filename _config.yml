@@ -3,11 +3,11 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: CHW's Notes
 subtitle:
-description:
-keywords:
-author: John Doe
+description: do somthing
+keywords: java
+author: chw
 language: zh-Hans
 timezone:
 
@@ -78,4 +78,6 @@ theme: next
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: https://github.com/caohuiwu/chw.github.io.git
+  branch: master
