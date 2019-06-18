@@ -81,3 +81,6 @@ deploy:
   type: git
   repo: https://github.com/caohuiwu/chw.github.io.git
   branch: master
+
+tag_plantuml:
+  type: static
