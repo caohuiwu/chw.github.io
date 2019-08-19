@@ -10,8 +10,10 @@ categories: io
 
 ![nio-1](nio/nio-common.png)
 
-以下是代码设计思想
+<!--more-->    
 
+以下是代码设计思想
+```
     //服务端
     public class BioServer {
     
@@ -86,11 +88,21 @@ categories: io
               ite.remove();
             }
         }
-      
-二、多路复用具体实现
+```      
+More info:[参考文章](https://www.bilibili.com/video/av54147951/)
+
+### 二、多路复用具体实现
     
     多路复用是nio模型的一个升级，将由应用程序循环遍历的socket列表交给了内核，由内核去通知应用程序socket是否OK。
-    Linux的select,poll,epoll三种多路复用模式。      
+      
+    
+1. 首先先了解Linux的select,poll,epoll三种多路复用模式。     
+More info:[参考文章](https://jeff.wtf/2017/02/IO-multiplexing/)        
+
+
+2. 再了解Java中的多路复用的实现
+More info:[参考文章](https://juejin.im/entry/599f971af265da247d728531)
+
         
 三、多路复用模式
 

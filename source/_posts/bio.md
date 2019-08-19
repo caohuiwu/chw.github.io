@@ -42,12 +42,11 @@ categories: io
         public static void main(String[] args) {
             Socket socket = new Socket();
             socket.connect(new InetSocketAddress("127.0.0.1", 9878));
-            
-            
         }
     }
     
 <!--more-->
+
 以下是图形解释
 
 ![bio-1](bio/bio.png)
