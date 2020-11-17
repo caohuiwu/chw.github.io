@@ -1,0 +1,29 @@
+---
+title: tomcat启动过程
+date: 2019-12-20 21:39:13
+tags:
+---
+
+# 一、tomcat的启动过程
+
+BootStrap.main()
+
+分成两步
+> * 1、资源初始化，load()，绑定serverSocket
+> * 2、资源启动，start()，connector创建acceptor连接线程池。
+
+<!--more-->
+
+时序图
+![tomcat启动过程](tomcat启动过程/tomcat-starting-procedure.jpeg)
+
+
+
+accepter：接收连接，生成socket。(socket = serverSock.accept();)
+poller：解析socket（processSocket -> ）
+
+
+
+
+参考
+[Tomcat整体架构浅析](https://blog.csdn.net/cx520forever/article/details/52743166)
