@@ -8,9 +8,10 @@ categories: io
 
 一、nio的设计思想
 
+<!--more-->  
+
 ![nio-1](nio/nio-common.png)
 
-<!--more-->    
 
 以下是代码设计思想
 ```

@@ -23,7 +23,7 @@ categories: Mybatis
     4、配置文件不要打入jar包，而是以文件方式统一放在服务的config目录中，方便修改 
 
 <!--more-->    
-    
+![redis-cache](Mybatis-online-accident/redis-cache.jpg)    
 ![redis-connect](Mybatis-online-accident/redis-connect.jpg)
 ![redis-io](Mybatis-online-accident/redis-io.jpg)
    
@@ -34,13 +34,13 @@ mybaits 一共有两级缓存：一级缓存的配置 key 是 localCacheScope，
 一级缓存是本地或者说局部缓存，它不能被关闭，只能配置缓存范围。SESSION 或者 STATEMENT。
 二级缓存才是 mybatis 的正统，功能会更强大些。
 
-### 一级缓存
+#### 3.1、一级缓存
 配置：
 开发者只需在MyBatis的配置文件中，添加如下语句，就可以使用一级缓存。共有两个选项，SESSION或者STATEMENT，默认是SESSION级别，即在一个MyBatis会话中执行的所有语句，都会共享这一个缓存。一种是STATEMENT级别，可以理解为缓存只对当前执行的这一个Statement有效。
 
     <setting name="localCacheScope" value="SESSION"/>
 
-### 二级缓存
+#### 3.2、二级缓存
 配置：
 
 1.在MyBatis的配置文件中开启二级缓存。
@@ -132,7 +132,7 @@ Spring对SqlSessionFactroyBean的初始化过程
     2.MyBatis一级缓存内部设计简单，只是一个没有容量限定的HashMap，在缓存的功能性上有所欠缺。
     3.MyBatis的一级缓存最大范围是SqlSession内部，有多个SqlSession或者分布式的环境下，数据库写操作会引起脏数据，建议设定缓存级别为Statement。    
     
-类关系图：
+#### 4.1、类关系图：
 ![sqlsession-class-relation](Mybatis-online-accident/sqlsession-class-relation.jpg)    
     
 每个SqlSession中持有了Executor，每个Executor中有一个LocalCache。当用户发起查询时，MyBatis根据当前执行的语句生成MappedStatement，在Local Cache进行查询，如果缓存命中的话，直接返回结果给用户，如果缓存没有命中的话，查询数据库，结果写入Local Cache，最后返回结果给用户。    

@@ -11,9 +11,9 @@ tomcat处理请求，要怎么做呢？
 
 ### 一、Tomcat的一个简单架构图
 
-![tomcat架构](tomcat架构/tomcat-framework.jpg)
-
 <!--more-->  
+
+![tomcat架构](tomcat架构/tomcat-framework.jpg)
 
 可以看出Tomcat的一个整体架构
 > * 一个server服务器，可以包含多个服务；
