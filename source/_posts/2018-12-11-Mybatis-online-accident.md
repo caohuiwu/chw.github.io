@@ -1,6 +1,6 @@
 ---
 title: Mybatis线上事故解析(一、二级缓存)
-date: 2019-11-17 23:00:42
+date: 2018-12-11 23:00:42
 tags: Mybatis
 categories: Mybatis
 ---
@@ -23,9 +23,9 @@ categories: Mybatis
     4、配置文件不要打入jar包，而是以文件方式统一放在服务的config目录中，方便修改 
 
 <!--more-->    
-![redis-cache](Mybatis-online-accident/redis-cache.jpg)    
-![redis-connect](Mybatis-online-accident/redis-connect.jpg)
-![redis-io](Mybatis-online-accident/redis-io.jpg)
+![redis-cache](2018-12-11-Mybatis-online-accident/redis-cache.jpg)    
+![redis-connect](2018-12-11-Mybatis-online-accident/redis-connect.jpg)
+![redis-io](2018-12-11-Mybatis-online-accident/redis-io.jpg)
    
     
 # 三、Mybatis一、二级缓存原理解析
@@ -133,7 +133,7 @@ Spring对SqlSessionFactroyBean的初始化过程
     3.MyBatis的一级缓存最大范围是SqlSession内部，有多个SqlSession或者分布式的环境下，数据库写操作会引起脏数据，建议设定缓存级别为Statement。    
     
 #### 4.1、类关系图：
-![sqlsession-class-relation](Mybatis-online-accident/sqlsession-class-relation.jpg)    
+![sqlsession-class-relation](2018-12-11-Mybatis-online-accident/sqlsession-class-relation.jpg)    
     
 每个SqlSession中持有了Executor，每个Executor中有一个LocalCache。当用户发起查询时，MyBatis根据当前执行的语句生成MappedStatement，在Local Cache进行查询，如果缓存命中的话，直接返回结果给用户，如果缓存没有命中的话，查询数据库，结果写入Local Cache，最后返回结果给用户。    
 
