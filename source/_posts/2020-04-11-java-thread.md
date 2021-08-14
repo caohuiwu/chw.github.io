@@ -197,7 +197,7 @@ public static native void yield();
 * 创建FutureTask对象，创建Callable子类对象，复写call(相当于run)方法，将其传递给FutureTask对象（相当于一个Runnable）
 * 线程池
 
-1、Thread类
+## 1、Thread类
 ```
 public class MyThread extends Thread{ 
     @Override 
@@ -213,14 +213,18 @@ public class MyThreadTest {
         thread.start(); }
 }
 ```
-**为什么需要start()才能启动线程？**      
+### 2.1、start和run方法的区别      
 1. new Thread()：此时只是创建了Thread对象，没有实际去创建线程
-2. thread.start()：启动线程，实际操作的是调用Linux创建进程，直到进程获取CPU资源才会执行。
+2. thread.start()：
     1. 内部执行native start0()方法
-    2. start0()方法内部会调用OS创建进程的方法
+    2. start0()方法内部会调用OS创建线程的方法
+        * Linux下的pthread函数，创建线程，更新JVM进程内存空间
     3. start0()方法执行后，会调用run()方法
+3. thread.run()：
+    1. 内部不会创建新的线程
+    2. 由当前线程去执行run方法
 
-2、Runnable接口
+## 2、Runnable接口
 ```
 public class MyRunnable implements Runnable{ 
     @Override 
@@ -239,7 +243,7 @@ public class MyRunnableTest {
 }
 ```
 
-3、Callable
+## 3、Callable
 ```
 public class MyCallable implements Callable { 
     @Override 
@@ -266,7 +270,7 @@ public class MyCallableTest {
 }
 ```
 
-4、线程池
+## 4、线程池
 ```
 public class MyRunnable implements Runnable{ 
     @Override 
@@ -288,7 +292,7 @@ public class SingleThreadExecutorTest {
 ```
 
 
-三、linux进程和java线程
+# 三、linux进程和java线程
 ![线程进程关系](2020-04-11-java-thread/线程进程关系.png)
 
 ![jvm-linux](2020-04-11-java-thread/jvm线程-Linux进程.png)

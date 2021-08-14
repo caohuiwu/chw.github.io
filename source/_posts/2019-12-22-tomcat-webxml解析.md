@@ -10,6 +10,8 @@ tags: Tomcat
 # 二、server.xml解析，在加载阶段
 
 Catalina的load方法，此时会去解析server.xml文件
+
+<!--more-->
 ```
 public void load() {
     // Create and execute our Digester
