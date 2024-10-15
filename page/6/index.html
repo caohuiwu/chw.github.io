@@ -6,7 +6,7 @@
 
 
 <html class="theme-next gemini use-motion" lang="zh-Hans">
-<head><meta name="generator" content="Hexo 3.8.0">
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -493,10 +493,14 @@
 
       
         
-          <p>记录一下搭建过程，备忘。</p>
-<h3 id="1、安装相应软件"><a href="#1、安装相应软件" class="headerlink" title="1、安装相应软件"></a>1、安装相应软件</h3><p>安装Node.js</p>
-<h3 id="2、具体流程"><a href="#2、具体流程" class="headerlink" title="2、具体流程"></a>2、具体流程</h3><p>基于多人协作</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1、 创建githubname.github.io的仓库。</span><br><span class="line">2、 创建分支：hexo</span><br><span class="line">3、 本地创建空文件夹，执行hexo init[将生成_config.yml等文件]，然后将空文件夹内的所有内容复制到本地仓库</span><br><span class="line">4、 在hexo分支执行hexo g, hexo s。然后访问http://localhost:4000，就可以看见博客</span><br><span class="line"></span><br><span class="line">注意：githubname必须是github账户的名字</span><br></pre></td></tr></table></figure>
+          
+          记录一下搭建过程，备忘。
+1、安装相应软件下载和安装 Node.js 和 npm如下命令：查看版本号
+12node -vnpm -version
+
+2、具体流程基于多人协作
+123456789101、 创建githubname.github.io的仓库。2、 创建分支：hexo3、 本地创建空文件夹，执行hexo init[将生成_config.yml等文件]，然后将空文件夹内的所有内容复制到本地仓库4、 在hexo分支执行hexo g, hexo s。然后访问http://localhost:4000，就可以看见博客    4.1、会出现空白页的情况，此时可能是themes未安装next主题
+          ...
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2018/10/02/本博客搭建/#more" rel="contents">
