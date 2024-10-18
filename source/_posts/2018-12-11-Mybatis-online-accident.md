@@ -2,7 +2,8 @@
 title: Mybatis线上事故解析(一、二级缓存)
 date: 2018-12-11 23:00:42
 tags: Mybatis
-categories: Mybatis
+categories: 
+  - [mybatis, 线上问题]
 ---
 
 # 一、问题场景：统一登录平台出现无法登录和菜单异常问题。

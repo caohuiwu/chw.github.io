@@ -2,6 +2,8 @@
 title: springmvc
 date: 2021-01-04 22:18:37
 tags: spring springmvc
+categories:
+  - [spring, springmvc]
 ---
 
 #  一、HandlerMapping映射过程
