@@ -91,7 +91,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/12/11/2018-12-11-Mybatis-online-accident/redis-connect.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/12/11/2018-12-11-Mybatis-online-accident/redis-io.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/12/11/2018-12-11-Mybatis-online-accident/sqlsession-class-relation.jpg">
-<meta property="og:updated_time" content="2024-10-14T09:38:11.804Z">
+<meta property="og:updated_time" content="2024-10-18T01:57:16.881Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Mybatis线上事故解析(一、二级缓存)">
 <meta name="twitter:description" content="一、问题场景：统一登录平台出现无法登录和菜单异常问题。二、问题原因：1、mybatis二级缓存组件使用不当：在高并发情况下，mybatis二级缓存组件实现方式会在数据更新，修改和删除时，     频繁调用redis中的keysByScan去获取当前库中全局匹配到的key，当key数量足够多时，执行时间会十分漫长，     导致整个redis服务并夯住，出于不可用状态 2、redis超时时间设置过长">
@@ -310,8 +310,19 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mybatis/" itemprop="url" rel="index">
-                    <span itemprop="name">Mybatis</span>
+                  <a href="/categories/mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">mybatis</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mybatis/线上问题/" itemprop="url" rel="index">
+                    <span itemprop="name">线上问题</span>
                   </a>
                 </span>
 
@@ -589,7 +600,7 @@ public SqlSessionFactory build(Configuration config) {
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">54</span>
+                  <span class="site-state-item-count">55</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -600,7 +611,7 @@ public SqlSessionFactory build(Configuration config) {
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -611,7 +622,7 @@ public SqlSessionFactory build(Configuration config) {
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">33</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
