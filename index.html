@@ -371,7 +371,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  30
+                  753
                 </span>
               
 
@@ -387,7 +387,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  3
                 </span>
               
             </div>
@@ -409,7 +409,12 @@
 
       
         
-          <pre><code>这是性能优化系列的第三篇文章，主要介绍的是多线程相关优化。</code></pre><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3>
+          <pre><code>这是性能优化系列的第三篇文章，主要介绍的是多线程相关优化。</code></pre><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><p>在美团，主要是负责对资产管理系统的重构工作，现在对系统的作用及功能做介绍。</p>
+<ul>
+<li>系统定位：对美团的充电宝、优选物资、优选低值物资等资产的完整生命周期进行管理。</li>
+<li>主要功能：资产新增、资产重建、资产调整、资产折旧、资产处置等。</li>
+</ul>
+<p>对资产的操作，例如资产新增，一般是通过excel导入系统，导入的数据量最多30W行，如此大的数据量，处理时长达1小时，系统可以说是一种不可用的状态。当时从产品设计、系统架构、数据模型，对系统进行了重大的调整。本文主要对多线程方面进行讲解。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2024/03/05/2024-03-05-性能优化-多线程优化/#more" rel="contents">
