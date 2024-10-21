@@ -88,7 +88,7 @@
 <meta property="og:description" content="这是性能优化系列的第三篇文章，主要介绍的是多线程相关优化。一、背景在美团，主要是负责对资产管理系统的重构工作，现在对系统的作用及功能做介绍。  系统定位：对美团的充电宝、优选物资、优选低值物资等资产的完整生命周期进行管理。 主要功能：资产新增、资产重建、资产调整、资产折旧、资产处置等。  对资产的操作，例如资产新增，一般是通过excel导入系统，导入的数据量最多30W行，如此大的数据量，处理时长达">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://www.plantuml.com/plantuml/svg/hP7FIiD04CRl-nJx0ZrupS5tMTCz1AhMPX6zvQ3YdxID-A_GDkq6IufW4xHAIHRoCZkRzTHNC3GM2Ws2u6LWXlb-y_4DCTbX2-jv0DTS9WdSzb2Jj9XbMaromB3-E9D9cCzuxbtaxscUZb2TCB97R8htJ-sZ1aARsjhkjW0RFnJr64FWBuKBaO3p2JqnQGCHard7XD6gIzkZAhw1GJZWHV0SokIciF8lJBbmr92NLMTzpLsvU2kgUeXLUwR6_El5NOfBDHOWkklsgXA_ogbm-Tg3mLGvuNhRLQE9ZW9YsvILEisdln5aDYmWfGEqcjMgpUli7le-gjC_9b7GDfvfu1s8k-hf4xnEISpJE-KFq3S0">
-<meta property="og:updated_time" content="2024-10-18T08:33:45.826Z">
+<meta property="og:updated_time" content="2024-10-19T08:08:38.485Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《性能优化系列》多线程优化">
 <meta name="twitter:description" content="这是性能优化系列的第三篇文章，主要介绍的是多线程相关优化。一、背景在美团，主要是负责对资产管理系统的重构工作，现在对系统的作用及功能做介绍。  系统定位：对美团的充电宝、优选物资、优选低值物资等资产的完整生命周期进行管理。 主要功能：资产新增、资产重建、资产调整、资产折旧、资产处置等。  对资产的操作，例如资产新增，一般是通过excel导入系统，导入的数据量最多30W行，如此大的数据量，处理时长达">
@@ -318,8 +318,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/并发/" itemprop="url" rel="index">
-                    <span itemprop="name">并发</span>
+                  <a href="/categories/性能优化/" itemprop="url" rel="index">
+                    <span itemprop="name">性能优化</span>
                   </a>
                 </span>
 
@@ -329,8 +329,8 @@
                 
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/性能优化/" itemprop="url" rel="index">
-                    <span itemprop="name">性能优化</span>
+                  <a href="/categories/多线程/并发/" itemprop="url" rel="index">
+                    <span itemprop="name">并发</span>
                   </a>
                 </span>
 
@@ -376,7 +376,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  753
+                  757
                 </span>
               
 
@@ -425,7 +425,7 @@
 <img src="http://www.plantuml.com/plantuml/svg/hP7FIiD04CRl-nJx0ZrupS5tMTCz1AhMPX6zvQ3YdxID-A_GDkq6IufW4xHAIHRoCZkRzTHNC3GM2Ws2u6LWXlb-y_4DCTbX2-jv0DTS9WdSzb2Jj9XbMaromB3-E9D9cCzuxbtaxscUZb2TCB97R8htJ-sZ1aARsjhkjW0RFnJr64FWBuKBaO3p2JqnQGCHard7XD6gIzkZAhw1GJZWHV0SokIciF8lJBbmr92NLMTzpLsvU2kgUeXLUwR6_El5NOfBDHOWkklsgXA_ogbm-Tg3mLGvuNhRLQE9ZW9YsvILEisdln5aDYmWfGEqcjMgpUli7le-gjC_9b7GDfvfu1s8k-hf4xnEISpJE-KFq3S0">
 
 <p>伪代码如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Object&gt; assetList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="comment">//开启事务：@Transaction</span></span><br><span class="line"><span class="keyword">for</span> (Object asset : assetList) &#123;</span><br><span class="line">    <span class="comment">//对资产进行校验</span></span><br><span class="line">    check(asset);</span><br><span class="line">    service.addAsset(asset);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Object&gt; assetList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="comment">//开启事务：@Transaction</span></span><br><span class="line"><span class="keyword">for</span> (Object asset : assetList) &#123;</span><br><span class="line">    <span class="comment">//对资产进行校验</span></span><br><span class="line">    check(asset);</span><br><span class="line">    <span class="comment">//数据存储</span></span><br><span class="line">    service.addAsset(asset);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="三、优化"><a href="#三、优化" class="headerlink" title="三、优化"></a>三、优化</h3><p>优化思路：</p>
 <ul>
@@ -573,7 +573,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">56</span>
+                  <span class="site-state-item-count">57</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -584,7 +584,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>

@@ -92,7 +92,7 @@
 <meta property="og:image" content="http://yoursite.com/2024/03/07/2024-03-07-性能优化-jvm优化/GC%E6%97%A5%E5%BF%97.png">
 <meta property="og:image" content="http://yoursite.com/2024/03/07/2024-03-07-性能优化-jvm优化/classloader.png">
 <meta property="og:image" content="http://yoursite.com/2024/03/07/2024-03-07-性能优化-jvm优化/%E7%B1%BB%E8%A7%86%E5%9B%BE.png">
-<meta property="og:updated_time" content="2024-10-18T14:19:07.914Z">
+<meta property="og:updated_time" content="2024-10-19T00:15:16.519Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《性能优化系列》jvm优化">
 <meta name="twitter:description" content="这是性能优化系列的第四篇文章，主要介绍的是jvm相关优化。一、背景在做商品相关业务时，需要将A系统的部分功能迁移到商品系统，过程中遇到多个jvm的问题。  metaspace oom问题。 YGC频繁问题。">
@@ -439,7 +439,10 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">JDK1.8</span><br><span class="line">-Xms8g</span><br><span class="line">-Xmx8g</span><br><span class="line">-Xmn4g</span><br><span class="line">-XX:MetaspaceSize=512M</span><br><span class="line">-XX:+UseConcMarkSweepGC</span><br></pre></td></tr></table></figure>
 
 <h3 id="二、metaspace-oom问题"><a href="#二、metaspace-oom问题" class="headerlink" title="二、metaspace oom问题"></a>二、metaspace oom问题</h3><h4 id="问题表现"><a href="#问题表现" class="headerlink" title="问题表现"></a>问题表现</h4><p>应用在主预发环境部署后，经过一段时间，业务方寻找过来，说明主预发环境无法提供服务的问题。</p>
-<h5 id="1-初步分析"><a href="#1-初步分析" class="headerlink" title="1 初步分析"></a>1 初步分析</h5><p>应用无法提供响应，首先去Sunfire查看应用的基础监控项和业务监控项，如下为基础监控项：<br><img src="/2024/03/07/2024-03-07-性能优化-jvm优化/metaspaceoom.png" alt="metaspaceoom"><br>*图片为网络图片，当时的图片未留存（错误类似）<br>分析结果：当时的第一感觉是metaspace基础监控项有问题，占用内存一直增加，可能是metaspace oom导致的应用崩溃。</p>
+<h5 id="1-初步分析"><a href="#1-初步分析" class="headerlink" title="1 初步分析"></a>1 初步分析</h5><p>应用无法提供响应，首先去Sunfire查看应用的基础监控项和业务监控项，如下为基础监控项：<br><img src="/2024/03/07/2024-03-07-性能优化-jvm优化/metaspaceoom.png" alt="metaspaceoom"><br>*图片为网络图片，当时的图片未留存（错误类似）   </p>
+<blockquote>
+<p>分析结果：当时的第一感觉是metaspace基础监控项有问题，占用内存一直增加，可能是metaspace oom导致的应用崩溃。</p>
+</blockquote>
 <h5 id="2-查看错误日志"><a href="#2-查看错误日志" class="headerlink" title="2 查看错误日志"></a>2 查看错误日志</h5><p>查看错误日志，明显报出了java.lang.OutOfMemoryError: Metaspace。从这里就能够确定问题了。<br><img src="/2024/03/07/2024-03-07-性能优化-jvm优化/%E4%B8%9A%E5%8A%A1%E6%97%A5%E5%BF%97.png" alt="metaspaceoom"><br>*图片为网络图片，当时的图片未留存（错误类似）</p>
 <blockquote>
 <p>分析结果：确定为 metaspace oom</p>
@@ -515,6 +518,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/03/20/2024-03-20-性能优化-服务RT上升/" rel="prev" title="《性能优化系列》服务RT上升">
+                《性能优化系列》服务RT上升 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -593,7 +600,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">56</span>
+                  <span class="site-state-item-count">57</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -604,7 +611,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
