@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="阿里,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这是稳定性系列的第四篇文章，主要介绍的是线程池的设置。一、理论分析业界的一些线程池参数配置方案：">
+<meta name="keywords" content="阿里">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《稳定性》线程池要设置多大">
+<meta property="og:url" content="http://yoursite.com/2024/06/15/2024-06-15-稳定性-线程池要设置多大/index.html">
+<meta property="og:site_name" content="CHW&#39;s Notes">
+<meta property="og:description" content="这是稳定性系列的第四篇文章，主要介绍的是线程池的设置。一、理论分析业界的一些线程池参数配置方案：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2024/06/15/2024-06-15-稳定性-线程池要设置多大/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88.png">
+<meta property="og:image" content="http://yoursite.com/2024/06/15/2024-06-15-稳定性-线程池要设置多大/%E9%98%9F%E5%88%97%E5%92%8C%E6%B5%81%E9%87%8F%E7%9A%84%E5%85%B3%E7%B3%BB.png">
+<meta property="og:updated_time" content="2024-10-27T04:09:33.839Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《稳定性》线程池要设置多大">
+<meta name="twitter:description" content="这是稳定性系列的第四篇文章，主要介绍的是线程池的设置。一、理论分析业界的一些线程池参数配置方案：">
+<meta name="twitter:image" content="http://yoursite.com/2024/06/15/2024-06-15-稳定性-线程池要设置多大/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2024/06/15/2024-06-15-稳定性-线程池要设置多大/">
+
+
+
+
+
+  <title>《稳定性》线程池要设置多大 | CHW's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CHW's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-fa fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2024/06/15/2024-06-15-稳定性-线程池要设置多大/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chw">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CHW's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《稳定性》线程池要设置多大</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-06-15T10:00:00+08:00">
+                2024-06-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/线程池/" itemprop="url" rel="index">
+                    <span itemprop="name">线程池</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/阿里/" itemprop="url" rel="index">
+                    <span itemprop="name">阿里</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/稳定性/" itemprop="url" rel="index">
+                    <span itemprop="name">稳定性</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  987
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>这是稳定性系列的第四篇文章，主要介绍的是线程池的设置。</code></pre><h3 id="一、理论分析"><a href="#一、理论分析" class="headerlink" title="一、理论分析"></a>一、理论分析</h3><p><strong>业界的一些线程池参数配置方案：</strong><br><img src="/2024/06/15/2024-06-15-稳定性-线程池要设置多大/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE%E6%96%B9%E6%A1%88.png" alt="线程池参数配置方案"></p>
+<a id="more"></a>
+<blockquote>
+<p>一般思路：会使用第3种计算方式去得到大致的线程池数量。</p>
+<p>示例如下：假设1秒需要执行1000个任务，每个任务执行耗时40ms，那么需要多少个线程？</p>
+<p>公式：任务个数/每秒执行个数=线程数量</p>
+<ul>
+<li>1000/(1000/40)=40个线程</li>
+</ul>
+</blockquote>
+<p><strong>和CPU利用率的关系：</strong></p>
+<blockquote>
+<p>示例如下：任务执行耗时40ms，其中计算10ms，数据库IO为30ms。</p>
+<p>CPU利用率=10/40=25%</p>
+</blockquote>
+<p><strong>线程数量&amp;队列&amp;流量关系：</strong><br><img src="/2024/06/15/2024-06-15-稳定性-线程池要设置多大/%E9%98%9F%E5%88%97%E5%92%8C%E6%B5%81%E9%87%8F%E7%9A%84%E5%85%B3%E7%B3%BB.png" alt="线程池参数配置方案"></p>
+<blockquote>
+<ul>
+<li><strong>线程处理速度 &lt; 流量：</strong> 导致队列堆积，导致影响业务，极端情况下OOM；</li>
+<li><strong>线程处理速度 = 流量：</strong> 比较稳定的情况，一般不会出现大问题。</li>
+<li><strong>线程处理速度 &gt; 流量：</strong> 有可能是线程数量过多，造成资源浪费。</li>
+</ul>
+</blockquote>
+<h3 id="三、实际业务"><a href="#三、实际业务" class="headerlink" title="三、实际业务"></a>三、实际业务</h3><p>在实际业务中，为了系统稳定性，每个业务都会有独立的线程池，所以会存在多个线程池。那如果一个新业务来了，我们应该怎么设置线程池数量呢？这篇文章为订单拉单的后序文章。</p>
+<h4 id="3-1、线程预估"><a href="#3-1、线程预估" class="headerlink" title="3.1、线程预估"></a>3.1、线程预估</h4><p>这一步操作还是需要的，基于新业务的特性，根据理论分析，估算出大致的线程数量。预估出来后，我们应该怎么做呢？</p>
+<h4 id="3-2、分析影响"><a href="#3-2、分析影响" class="headerlink" title="3.2、分析影响"></a>3.2、分析影响</h4><p>预估出来后，需要分析影响。</p>
+<p>增加线程池，有可能会对现有业务造成影响（不管有木有影响，我们还是得去做考虑），应该从哪些方面进行分析呢？</p>
+<p><strong>方面1：业务响应时间 &amp; 吞吐量</strong><br>为什么需要考虑这个？</p>
+<blockquote>
+<p>新增线程池后，新任务会去抢占CPU的运行时间，造成进程上下文的切换，导致原有业务的执行时间减少，最终体现到响应时间和吞吐量上。</p>
+<ul>
+<li>解决方法：减少线程数量，增大队列，减少上下文切换。实际操作上，无法具体分析出影响范围有多大。<ul>
+<li>最佳实践：采用灰度发布的方式，逐步将新线程池引入现有业务系统；同时对现有业务的监控指标进行观察。</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr>
+<p><strong>方面2：<a href="2024-06-15-稳定性-线程池要设置多大.md">CPU负载 &amp; CPU利用率：</a></strong></p>
+<blockquote>
+<ol>
+<li>造成CPU负载的升高：增加线程池，那么会有更多的任务需要处理。例如I/O 密集型任务，这些进程会处于等待 I/O 完成的状态，此时它们并不占用大量的 CPU 资源，但会被计入系统负载中。<ol>
+<li>解决方法：根据不同的造成因素做不同的处理。</li>
+<li>例如应用程序问题，则优化程序；</li>
+<li>如果是机器问题，则增加CPU核心数量或升级硬件；</li>
+</ol>
+</li>
+<li>进程频繁上下文切换：<ol>
+<li>更多的任务，那么会竞争CPU使用资源，就会造成进程频繁上下文切换，会消耗一定的系统资源。</li>
+</ol>
+</li>
+</ol>
+</blockquote>
+<p>因此我们需要去查看CPU负载 &amp; CPU利用率，保证增加线程池后，两项指标不会升高到预期之外，并且不对其他现有业务造成过大的影响。</p>
+<hr>
+<p><strong>方面3：内存：</strong></p>
+<blockquote>
+<p>每开启一个线程都需要内存空间，并且任务堆积情况下，会造成内存消耗，极端情况下造成oom。</p>
+</blockquote>
+<h4 id="3-3、我们应该怎么做？"><a href="#3-3、我们应该怎么做？" class="headerlink" title="3.3、我们应该怎么做？"></a>3.3、我们应该怎么做？</h4><blockquote>
+<p>最佳实践：采用灰度发布的方式，逐步将新线程池引入现有业务系统；同时对现有业务的监控指标进行观察。</p>
+</blockquote>
+<p>参考文章：<br><a href="https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html" target="_blank" rel="noopener">Java线程池实现原理及其在美团业务中的实践</a><br><a href="https://juejin.cn/post/7067183465224994852#heading-5" target="_blank" rel="noopener">线程池的数量和线程池中线程数量如何设置-实践篇</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/阿里/" rel="tag"># 阿里</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/06/09/2024-06-09-稳定性-订单拉单/" rel="next" title="《稳定性》订单拉单">
+                <i class="fa fa-chevron-left"></i> 《稳定性》订单拉单
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/touxiang.jpg" alt="chw">
+            
+              <p class="site-author-name" itemprop="name">chw</p>
+              <p class="site-description motion-element" itemprop="description">do somthing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">64</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、理论分析"><span class="nav-number">1.</span> <span class="nav-text">一、理论分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、实际业务"><span class="nav-number">2.</span> <span class="nav-text">三、实际业务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1、线程预估"><span class="nav-number">2.1.</span> <span class="nav-text">3.1、线程预估</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2、分析影响"><span class="nav-number">2.2.</span> <span class="nav-text">3.2、分析影响</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3、我们应该怎么做？"><span class="nav-number">2.3.</span> <span class="nav-text">3.3、我们应该怎么做？</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chw</span>
+
+
+       <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
