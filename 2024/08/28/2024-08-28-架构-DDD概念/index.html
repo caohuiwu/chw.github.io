@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2024/08/28/2024-08-28-架构-DDD概念/%E4%BB%80%E4%B9%88%E6%98%AFDDD.png">
 <meta property="og:image" content="http://yoursite.com/2024/08/28/2024-08-28-架构-DDD概念/DDD%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%9B%BE.png">
-<meta property="og:updated_time" content="2024-12-02T14:32:09.688Z">
+<meta property="og:updated_time" content="2024-12-03T14:51:47.059Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《架构》DDD概念">
 <meta name="twitter:description" content="一、DDD领域驱动设计（Domain-Driven Design，简称DDD），DDD 是一种软件开发方法。">
@@ -355,7 +355,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  9.1k
+                  9.2k
                 </span>
               
 
@@ -371,7 +371,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  30
+                  31
                 </span>
               
             </div>
@@ -442,14 +442,11 @@
 <p>在 DDD 实践中，我们应该明确区分问题空间和解空间，避免混为一谈。</p>
 <h5 id="领域（Domain）"><a href="#领域（Domain）" class="headerlink" title="领域（Domain）"></a>领域（Domain）</h5><p>领域（Domain）是业务相关知识的集合。</p>
 <p>通俗来说，领域就是业务知识。业务有一些内在规则，存在专业性，比如财务、CRM、OA、电商等不同领域的业务规则不同。计算机只是业务规则的自动化。</p>
-<h5 id="子域（Sub-Domain）"><a href="#子域（Sub-Domain）" class="headerlink" title="子域（Sub Domain）"></a>子域（Sub Domain）</h5><p>一个子域是领域的一部分。</p>
-<p>为了降低业务理解复杂度，DDD 实践中通常将领域划分为子域，通过分而治之的方法分析问题。</p>
+<h5 id="子域（Sub-Domain）"><a href="#子域（Sub-Domain）" class="headerlink" title="子域（Sub Domain）"></a>子域（Sub Domain）</h5><p>子域（Subdomain）是指在一个大的领域中划分出的相对独立的子领域，它通常代表一个独立的业务领域，具有特定的业务逻辑和功能需求。子域可以是整个系统的一个功能模块，也可以是一个独立的业务流程。</p>
 <h5 id="核心域（Core-Domain）"><a href="#核心域（Core-Domain）" class="headerlink" title="核心域（Core Domain）"></a>核心域（Core Domain）</h5><p>核心域是指领域中最核心的部分，通常对应企业的核心业务</p>
 <p>核心域需要我们投入最大精力，进行充分的分析。因为它是一个企业能运转的基础。</p>
-<h5 id="支撑域（Support-Domain）"><a href="#支撑域（Support-Domain）" class="headerlink" title="支撑域（Support Domain）"></a>支撑域（Support Domain）</h5><p>支撑域是一种特殊的子域，是指为了实现核心业务而不得不开发的业务所对应的相关知识的集合。</p>
-<p>例如，活动平台业务属于电商的支撑域，因为该业务对于电商企业并不是必需的，其存在的意义仅在于放大利润。</p>
-<h5 id="通用域（General-Domain）"><a href="#通用域（General-Domain）" class="headerlink" title="通用域（General Domain）"></a>通用域（General Domain）</h5><p>通用域是另一种特殊的子域，对应的是业界已经有成熟方案的业务。</p>
-<p>通用域可以看做一种特殊的支撑域，可以使用标准部件来实现，短信通知、邮件等领域问题。</p>
+<h5 id="支撑域（Support-Domain）"><a href="#支撑域（Support-Domain）" class="headerlink" title="支撑域（Support Domain）"></a>支撑域（Support Domain）</h5><p>“支撑域”（Supporting Domain）指的是与核心业务的实现和发展密切相关的非业务功能。这些支撑域可以包括安全认证、用户管理、日志记录等在整个系统中被多个子域所共享和使用的基础设施功能。支撑域和通用域概念上有些类似，区分他们的标准简单归纳下的话，支撑域是由外域提供的能力，通用域是本域提供。</p>
+<h5 id="通用域（General-Domain）"><a href="#通用域（General-Domain）" class="headerlink" title="通用域（General Domain）"></a>通用域（General Domain）</h5><p>通用域（Generic Domain）是指与特定业务领域无关的通用功能，它是在整个领域中被多个子域所共享和复用的功能。通用域包括一些通用的服务、工具、组件等，用于支持多个子域的实现。</p>
 <hr>
 <h4 id="2-3、建模类概念"><a href="#2-3、建模类概念" class="headerlink" title="2.3、建模类概念"></a>2.3、建模类概念</h4><p>DDD领域设计相关模型的定义。</p>
 <h5 id="解空间（Solution-Space）"><a href="#解空间（Solution-Space）" class="headerlink" title="解空间（Solution Space）"></a>解空间（Solution Space）</h5><p>解空间是一个数学概念。是指满足问题的所有约束前提下，所有可行解的集合。在 DDD 的上下文中，指的是所有可能的解决方案的集合。</p>
