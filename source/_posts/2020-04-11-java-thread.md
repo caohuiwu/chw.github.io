@@ -1,8 +1,9 @@
 ---
 title: java-thread
 date: 2020-04-11 17:19:31
-tags: JVM Thread
-categories: JVM
+tags: jvm thread
+categories: 
+   - [java, jvm]
 ---
 
 # 一、线程状态

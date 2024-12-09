@@ -2,6 +2,8 @@
 title: linux pagecache
 date: 2020-08-08 21:24:46
 tags: linux pagecache buffercache
+categories:
+  - [linux]
 ---
 
 ## 一、磁盘文件的存储

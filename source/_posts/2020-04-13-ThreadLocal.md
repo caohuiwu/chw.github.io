@@ -1,8 +1,9 @@
 ---
 title: ThreadLocal
 date: 2020-04-13 16:58:29
-tags: JVM
-categories: JVM
+tags: jvm
+categories: 
+  - [java, jvm]
 ---
 # 一、背景
 * linux进程之间内存空间独立，互不影响，只有在两个进程访问共享变量时，才需要加锁，例如数据库等。

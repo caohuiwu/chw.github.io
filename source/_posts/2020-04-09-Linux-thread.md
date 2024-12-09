@@ -2,7 +2,8 @@
 title: Linux-thread
 date: 2020-04-09 18:19:15
 tags: Linux Thread
-categories: Linux
+categories: 
+  - [linux]
 ---
 
 # 一、什么是进程，进程和线程的区别
