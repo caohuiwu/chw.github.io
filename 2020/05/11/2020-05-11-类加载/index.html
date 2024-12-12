@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2020/05/11/2020-05-11-类加载/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B.png">
 <meta property="og:image" content="http://yoursite.com/2020/05/11/2020-05-11-类加载/%E7%B1%BB%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png">
-<meta property="og:updated_time" content="2024-12-09T03:22:02.617Z">
+<meta property="og:updated_time" content="2024-12-12T01:05:52.983Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="类加载">
 <meta name="twitter:description" content="一、类的加载过程从类加载顺序、类加载器等方面进行讲解 二、类加载顺序加载 -&amp;gt; 验证 -&amp;gt; 准备 -&amp;gt; 解析 -&amp;gt; 初始化 加载：将字节码文件加载至内存。 验证：验证字节码文件是否符合JVM规范 准备：对类或接口的静态变量分配空间，并默认初始值。此时不会执行任何字节码指令。因为在初始化阶段，会调用显式的初始化器来初始化。 解析：根据运行时常量池中的符号引用转化成直接引用解析">
@@ -344,7 +344,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  901
+                  904
                 </span>
               
 
@@ -394,7 +394,7 @@
 <h2 id="2-1、clinit详解"><a href="#2-1、clinit详解" class="headerlink" title="2.1、clinit详解"></a>2.1、clinit详解</h2><p>Java类加载的初始化过程，编译器会按语句在源文件出现的位置，依次自动收集类中的所有类变量的赋值动作和静态代码块，<br>然后<strong>合并产生clinit方法</strong>；如果类中没有静态语句和静态代码块，则可以不生成。</p>
 <p>并且 clinit() 不需要显式调用父类（接口除外，接口不需要调用父接口的初始化方法，只有使用到父接口中的静态变量时才需要调用）的初始化方法 clinit()，虚拟机会保证在子类的 clinit() 方法执行之前，父类的 clinit() 方法已经执行完毕。</p>
 <blockquote>
-<p>虚拟机首先执行的是类加载初始化过程中的 <clinit>() 方法，也就是静态变量赋值以及静态代码块中的代码，如果 <clinit>() 方法中触发了对象的初始化，也就是 <init>() 方法，那么会进入执行 <init>() 方法，执行 <init>() 方法完成之后，再回来继续执行 <clinit>() 方法。</clinit></init></init></init></clinit></clinit></p>
+<p>虚拟机首先执行的是类加载初始化过程中的 &lt;clinit&gt;() 方法，也就是静态变量赋值以及静态代码块中的代码，如果 <clinit>() 方法中触发了对象的初始化，也就是 <init>() 方法，那么会进入执行 <init>() 方法，执行 <init>() 方法完成之后，再回来继续执行 <clinit>() 方法。</clinit></init></init></init></clinit></p>
 </blockquote>
 <h1 id="三、类是生命周期"><a href="#三、类是生命周期" class="headerlink" title="三、类是生命周期"></a>三、类是生命周期</h1><p><img src="/2020/05/11/2020-05-11-类加载/%E7%B1%BB%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="类生命周期"></p>
 <h1 id="四、热加载"><a href="#四、热加载" class="headerlink" title="四、热加载"></a>四、热加载</h1><ol>
@@ -528,7 +528,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-count">82</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -539,7 +539,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">44</span>
+                  <span class="site-state-item-count">49</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -550,7 +550,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">35</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
