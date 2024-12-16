@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="虚拟机启动,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这是Java内存模型（JMM）系列的第0篇文章，主要介绍的是JMM的相关概念定义。一、JSR-133规范Java内存模型(java memory model)。给定一个程序和该程序的一串执行轨迹，内存模型用来屏蔽各种硬件和操作系统的内存访问差异，以实现Java查询在各种平台下都能达成一致的内存访问效果。  JSR-133 规范，即 JavaTM内存模型与线程规范，由 JSR-133 专家组开发。J">
+<meta name="keywords" content="虚拟机启动">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Java》JMM">
+<meta property="og:url" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-JMM/index.html">
+<meta property="og:site_name" content="CHW&#39;s Notes">
+<meta property="og:description" content="这是Java内存模型（JMM）系列的第0篇文章，主要介绍的是JMM的相关概念定义。一、JSR-133规范Java内存模型(java memory model)。给定一个程序和该程序的一串执行轨迹，内存模型用来屏蔽各种硬件和操作系统的内存访问差异，以实现Java查询在各种平台下都能达成一致的内存访问效果。  JSR-133 规范，即 JavaTM内存模型与线程规范，由 JSR-133 专家组开发。J">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-JMM/%E4%B8%BB%E5%86%85%E5%AD%98%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AD%98.png">
+<meta property="og:updated_time" content="2024-12-13T07:59:02.964Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Java》JMM">
+<meta name="twitter:description" content="这是Java内存模型（JMM）系列的第0篇文章，主要介绍的是JMM的相关概念定义。一、JSR-133规范Java内存模型(java memory model)。给定一个程序和该程序的一串执行轨迹，内存模型用来屏蔽各种硬件和操作系统的内存访问差异，以实现Java查询在各种平台下都能达成一致的内存访问效果。  JSR-133 规范，即 JavaTM内存模型与线程规范，由 JSR-133 专家组开发。J">
+<meta name="twitter:image" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-JMM/%E4%B8%BB%E5%86%85%E5%AD%98%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AD%98.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-JMM/">
+
+
+
+
+
+  <title>《Java》JMM | CHW's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CHW's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-fa fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-JMM/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chw">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CHW's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Java》JMM</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-19T12:19:31+08:00">
+                2020-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/jvm/虚拟机规范/" itemprop="url" rel="index">
+                    <span itemprop="name">虚拟机规范</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/jvm/虚拟机规范/jmm/" itemprop="url" rel="index">
+                    <span itemprop="name">jmm</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  637
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  2
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>这是Java内存模型（JMM）系列的第0篇文章，主要介绍的是JMM的相关概念定义。</code></pre><h3 id="一、JSR-133规范"><a href="#一、JSR-133规范" class="headerlink" title="一、JSR-133规范"></a>一、JSR-133规范</h3><p>Java内存模型(java memory model)。给定一个程序和该程序的一串执行轨迹，<strong>内存模型</strong><br>用来屏蔽各种硬件和操作系统的内存访问差异，以实现Java查询在各种平台下都能达成一致的内存访问效果。</p>
+<blockquote>
+<p>JSR-133 规范，即 JavaTM内存模型与线程规范，由 JSR-133 专家组开发。JSR-133规范的标准内容将合并到 JavaTM语言规范、JavaTM虚拟机规范。</p>
+</blockquote>
+<a id="more"></a>
+
+<h3 id="三、Java内存模型"><a href="#三、Java内存模型" class="headerlink" title="三、Java内存模型"></a>三、Java内存模型</h3><p>主要目的：定义程序中各种变量的访问规则，即关注在虚拟机中把变量值存储到内存和从内存中取出变量值这样的底层细节。</p>
+<blockquote>
+<p>变量包含：实例字段、静态字段和构成数组对象的元素。</p>
+</blockquote>
+<h4 id="3-1、主内存和工作内存"><a href="#3-1、主内存和工作内存" class="headerlink" title="3.1、主内存和工作内存"></a>3.1、主内存和工作内存</h4><p>Java内存模型的抽象：线程之间的共享变量存储在主内存（main memory）中，每个线程都有一个私有的本地内存（local memory），本地内存中存储了该线程以读/写共享变量的副本。<br><img src="/2020/04/19/2020-04-19-java-虚拟机规范-JMM/%E4%B8%BB%E5%86%85%E5%AD%98%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AD%98.png" alt="主内存和工作内存"></p>
+<h5 id="3-1-1、主内存"><a href="#3-1-1、主内存" class="headerlink" title="3.1.1、主内存"></a>3.1.1、主内存</h5><p>主内存是所有线程共享的内存区域，它存储着 Java 程序中的所有实例变量、静态变量和类信息等。</p>
+<blockquote>
+<p>当一个变量被声明为 static 或者是实例变量时，它就存储在主内存中.</p>
+</blockquote>
+<h5 id="3-1-2、工作内存"><a href="#3-1-2、工作内存" class="headerlink" title="3.1.2、工作内存"></a>3.1.2、工作内存</h5><p>本地内存是JMM的一个抽象概念，并不真实存在。它涵盖了缓存、写缓冲区、寄存器以及其他的硬件和编译器优化。</p>
+<h4 id="3-2、通信方式"><a href="#3-2、通信方式" class="headerlink" title="3.2、通信方式"></a>3.2、通信方式</h4><p>Java的通信，采用了共享内存的方式。</p>
+<h4 id="3-3、内存的交互方式"><a href="#3-3、内存的交互方式" class="headerlink" title="3.3、内存的交互方式"></a>3.3、内存的交互方式</h4><table>
+<thead>
+<tr>
+<th align="left">术语</th>
+<th align="right">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">lock</td>
+<td align="right">锁主内存的变量</td>
+</tr>
+<tr>
+<td align="left">unlock</td>
+<td align="right">解锁主内存的变量</td>
+</tr>
+<tr>
+<td align="left">read</td>
+<td align="right">读取主内存的变量</td>
+</tr>
+<tr>
+<td align="left">load</td>
+<td align="right">载入，作用于工作内存的变量，把read操作从主内存中得到的变量值放入到工作内存的变量副本中</td>
+</tr>
+<tr>
+<td align="left">use</td>
+<td align="right">使用，作用于工作内存</td>
+</tr>
+<tr>
+<td align="left">assign</td>
+<td align="right">赋值，作用于工作内存</td>
+</tr>
+<tr>
+<td align="left">store</td>
+<td align="right">存储，作用于工作内存，值传送到主内存</td>
+</tr>
+<tr>
+<td align="left">write</td>
+<td align="right">写入，把store操作的变量的值写入到主内存</td>
+</tr>
+</tbody></table>
+<h4 id="3-4、volatile"><a href="#3-4、volatile" class="headerlink" title="3.4、volatile"></a>3.4、volatile</h4><p>后续有相关章节文章。</p>
+<h4 id="3-5、final"><a href="#3-5、final" class="headerlink" title="3.5、final"></a>3.5、final</h4><p>后续有相关章节文章。</p>
+<h4 id="3-6、happens-before"><a href="#3-6、happens-before" class="headerlink" title="3.6、happens-before"></a>3.6、happens-before</h4><p>后续有相关章节文章。</p>
+<h4 id="3-7、锁"><a href="#3-7、锁" class="headerlink" title="3.7、锁"></a>3.7、锁</h4><p>后续有相关章节文章。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/虚拟机启动/" rel="tag"># 虚拟机启动</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/17/2020-04-17-java-虚拟机规范-加载_链接与初始化/" rel="next" title="《Java》加载、链接与初始化">
+                <i class="fa fa-chevron-left"></i> 《Java》加载、链接与初始化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/20/2020-04-20-java-虚拟机规范-进程通信/" rel="prev" title="《Java》JMM之“进程通信”">
+                《Java》JMM之“进程通信” <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/touxiang.jpg" alt="chw">
+            
+              <p class="site-author-name" itemprop="name">chw</p>
+              <p class="site-description motion-element" itemprop="description">do somthing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">85</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">52</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、JSR-133规范"><span class="nav-text">一、JSR-133规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、Java内存模型"><span class="nav-text">三、Java内存模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1、主内存和工作内存"><span class="nav-text">3.1、主内存和工作内存</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1-1、主内存"><span class="nav-text">3.1.1、主内存</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1-2、工作内存"><span class="nav-text">3.1.2、工作内存</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2、通信方式"><span class="nav-text">3.2、通信方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3、内存的交互方式"><span class="nav-text">3.3、内存的交互方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4、volatile"><span class="nav-text">3.4、volatile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5、final"><span class="nav-text">3.5、final</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-6、happens-before"><span class="nav-text">3.6、happens-before</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7、锁"><span class="nav-text">3.7、锁</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chw</span>
+
+
+       <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

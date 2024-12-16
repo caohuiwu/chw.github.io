@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="一、定义 加载是根据特定名称查找类或接口类型的二进制表示（Binary Representation），并由此二进制表示创建类或接口的过程。 链接是为了让类或接口可以被 Java 虚拟机执行，而将类或接口并入虚拟机运行时状态的过程。 类或接口的初始化是指执行类或接口的初始化方法。">
+<meta name="description" content="这是Java虚拟机规范系列的第五篇文章，主要介绍的是虚拟机规范中的虚拟机启动过程、类加载机制（过程）等内容。一、定义 加载是根据特定名称查找类或接口类型的二进制表示（Binary Representation），并由此二进制表示创建类或接口的过程。 链接是为了让类或接口可以被 Java 虚拟机执行，而将类或接口并入虚拟机运行时状态的过程。 类或接口的初始化是指执行类或接口的初始化方法。">
 <meta name="keywords" content="虚拟机启动">
 <meta property="og:type" content="article">
 <meta property="og:title" content="《Java》加载、链接与初始化">
 <meta property="og:url" content="http://yoursite.com/2020/04/17/2020-04-17-java-虚拟机规范-加载_链接与初始化/index.html">
 <meta property="og:site_name" content="CHW&#39;s Notes">
-<meta property="og:description" content="一、定义 加载是根据特定名称查找类或接口类型的二进制表示（Binary Representation），并由此二进制表示创建类或接口的过程。 链接是为了让类或接口可以被 Java 虚拟机执行，而将类或接口并入虚拟机运行时状态的过程。 类或接口的初始化是指执行类或接口的初始化方法。">
+<meta property="og:description" content="这是Java虚拟机规范系列的第五篇文章，主要介绍的是虚拟机规范中的虚拟机启动过程、类加载机制（过程）等内容。一、定义 加载是根据特定名称查找类或接口类型的二进制表示（Binary Representation），并由此二进制表示创建类或接口的过程。 链接是为了让类或接口可以被 Java 虚拟机执行，而将类或接口并入虚拟机运行时状态的过程。 类或接口的初始化是指执行类或接口的初始化方法。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2024-12-12T01:32:45.285Z">
+<meta property="og:updated_time" content="2024-12-13T08:08:59.779Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Java》加载、链接与初始化">
-<meta name="twitter:description" content="一、定义 加载是根据特定名称查找类或接口类型的二进制表示（Binary Representation），并由此二进制表示创建类或接口的过程。 链接是为了让类或接口可以被 Java 虚拟机执行，而将类或接口并入虚拟机运行时状态的过程。 类或接口的初始化是指执行类或接口的初始化方法。">
+<meta name="twitter:description" content="这是Java虚拟机规范系列的第五篇文章，主要介绍的是虚拟机规范中的虚拟机启动过程、类加载机制（过程）等内容。一、定义 加载是根据特定名称查找类或接口类型的二进制表示（Binary Representation），并由此二进制表示创建类或接口的过程。 链接是为了让类或接口可以被 Java 虚拟机执行，而将类或接口并入虚拟机运行时状态的过程。 类或接口的初始化是指执行类或接口的初始化方法。">
 
 
 
@@ -374,7 +374,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  3.2k
+                  3.3k
                 </span>
               
 
@@ -411,7 +411,7 @@
       
 
       
-        <h3 id="一、定义"><a href="#一、定义" class="headerlink" title="一、定义"></a>一、定义</h3><ul>
+        <pre><code>这是Java虚拟机规范系列的第五篇文章，主要介绍的是虚拟机规范中的虚拟机启动过程、类加载机制（过程）等内容。</code></pre><h3 id="一、定义"><a href="#一、定义" class="headerlink" title="一、定义"></a>一、定义</h3><ul>
 <li><strong>加载</strong>是根据特定名称查找类或接口类型的二进制表示（Binary Representation），并由此二进制表示创建类或接口的过程。</li>
 <li><strong>链接</strong>是为了让类或接口可以被 Java 虚拟机执行，而将类或接口并入虚拟机运行时状态的过程。</li>
 <li><strong>类或接口的初始化</strong>是指执行类或接口的初始化方法<clinit>。</clinit></li>
@@ -552,8 +552,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/05/07/2020-05-07-零拷贝/" rel="prev" title="零拷贝">
-                零拷贝 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/04/19/2020-04-19-java-虚拟机规范-JMM/" rel="prev" title="《Java》JMM">
+                《Java》JMM <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -633,7 +633,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-count">85</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -644,7 +644,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-count">52</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>

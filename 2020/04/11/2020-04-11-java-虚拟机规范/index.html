@@ -79,13 +79,13 @@
 
 
 
-<meta name="description" content="一、虚拟机规范许多人知道类加载机制、JVM内存模型，但他们可能不知道什么是《Java虚拟机规范》。对于Java开发来说，《Java虚拟机规范》才是最为官方、准确的一个文档，了解这个规范可以让我们更深入地理解JVM。我们平常说的JVM其实更多说的是HotSpot（HotSpot是JVM规范的一种实现），但我们常常将HotSpot与JVM等同起来。正因对于JVM规范认识的不足，所以我专门准备一个系列的">
+<meta name="description" content="这是Java虚拟机规范系列的第一篇文章，主要介绍的是虚拟机规范官方文章章节概览。一、虚拟机规范许多人知道类加载机制、JVM内存模型，但他们可能不知道什么是《Java虚拟机规范》。对于Java开发来说，《Java虚拟机规范》才是最为官方、准确的一个文档，了解这个规范可以让我们更深入地理解JVM。我们平常说的JVM其实更多说的是HotSpot（HotSpot是JVM规范的一种实现），但我们常常将Hot">
 <meta name="keywords" content="java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="《Java》虚拟机规范">
 <meta property="og:url" content="http://yoursite.com/2020/04/11/2020-04-11-java-虚拟机规范/index.html">
 <meta property="og:site_name" content="CHW&#39;s Notes">
-<meta property="og:description" content="一、虚拟机规范许多人知道类加载机制、JVM内存模型，但他们可能不知道什么是《Java虚拟机规范》。对于Java开发来说，《Java虚拟机规范》才是最为官方、准确的一个文档，了解这个规范可以让我们更深入地理解JVM。我们平常说的JVM其实更多说的是HotSpot（HotSpot是JVM规范的一种实现），但我们常常将HotSpot与JVM等同起来。正因对于JVM规范认识的不足，所以我专门准备一个系列的">
+<meta property="og:description" content="这是Java虚拟机规范系列的第一篇文章，主要介绍的是虚拟机规范官方文章章节概览。一、虚拟机规范许多人知道类加载机制、JVM内存模型，但他们可能不知道什么是《Java虚拟机规范》。对于Java开发来说，《Java虚拟机规范》才是最为官方、准确的一个文档，了解这个规范可以让我们更深入地理解JVM。我们平常说的JVM其实更多说的是HotSpot（HotSpot是JVM规范的一种实现），但我们常常将Hot">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2020/04/11/2020-04-11-java-虚拟机规范/%E7%AC%AC2%E7%AB%A0_java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%BB%93%E6%9E%84.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/11/2020-04-11-java-虚拟机规范/%E7%AC%AC3%E7%AB%A0_%E4%B8%BAJava%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%BC%96%E8%AF%91.png">
@@ -93,10 +93,10 @@
 <meta property="og:image" content="http://yoursite.com/2020/04/11/2020-04-11-java-虚拟机规范/%E7%AC%AC5%E7%AB%A0_%E5%8A%A0%E8%BD%BD_%E9%93%BE%E6%8E%A5%E4%B8%8E%E5%88%9D%E5%A7%8B%E5%8C%96.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/11/2020-04-11-java-虚拟机规范/%E7%AC%AC6%E7%AB%A0_java%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%8C%87%E4%BB%A4%E9%9B%86.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/11/2020-04-11-java-虚拟机规范/%E7%AC%AC7%E7%AB%A0_%E6%93%8D%E4%BD%9C%E7%A0%81%E5%8A%A9%E8%AE%B0%E7%AC%A6.png">
-<meta property="og:updated_time" content="2024-12-09T08:23:22.256Z">
+<meta property="og:updated_time" content="2024-12-13T03:04:38.922Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Java》虚拟机规范">
-<meta name="twitter:description" content="一、虚拟机规范许多人知道类加载机制、JVM内存模型，但他们可能不知道什么是《Java虚拟机规范》。对于Java开发来说，《Java虚拟机规范》才是最为官方、准确的一个文档，了解这个规范可以让我们更深入地理解JVM。我们平常说的JVM其实更多说的是HotSpot（HotSpot是JVM规范的一种实现），但我们常常将HotSpot与JVM等同起来。正因对于JVM规范认识的不足，所以我专门准备一个系列的">
+<meta name="twitter:description" content="这是Java虚拟机规范系列的第一篇文章，主要介绍的是虚拟机规范官方文章章节概览。一、虚拟机规范许多人知道类加载机制、JVM内存模型，但他们可能不知道什么是《Java虚拟机规范》。对于Java开发来说，《Java虚拟机规范》才是最为官方、准确的一个文档，了解这个规范可以让我们更深入地理解JVM。我们平常说的JVM其实更多说的是HotSpot（HotSpot是JVM规范的一种实现），但我们常常将Hot">
 <meta name="twitter:image" content="http://yoursite.com/2020/04/11/2020-04-11-java-虚拟机规范/%E7%AC%AC2%E7%AB%A0_java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%BB%93%E6%9E%84.png">
 
 
@@ -407,7 +407,7 @@
       
 
       
-        <h3 id="一、虚拟机规范"><a href="#一、虚拟机规范" class="headerlink" title="一、虚拟机规范"></a>一、虚拟机规范</h3><p>许多人知道类加载机制、JVM内存模型，但他们可能不知道什么是《Java虚拟机规范》。对于Java开发来说，《Java虚拟机规范》才是最为官方、准确的一个文档，了解这个规范可以让我们更深入地理解JVM。我们平常说的JVM其实更多说的是HotSpot（HotSpot是JVM规范的一种实现），但我们常常将HotSpot与JVM等同起来。正因对于JVM规范认识的不足，所以我专门准备一个系列的文章，带着大家读一读JVM规范。</p>
+        <pre><code>这是Java虚拟机规范系列的第一篇文章，主要介绍的是虚拟机规范官方文章章节概览。</code></pre><h3 id="一、虚拟机规范"><a href="#一、虚拟机规范" class="headerlink" title="一、虚拟机规范"></a>一、虚拟机规范</h3><p>许多人知道类加载机制、JVM内存模型，但他们可能不知道什么是《Java虚拟机规范》。对于Java开发来说，《Java虚拟机规范》才是最为官方、准确的一个文档，了解这个规范可以让我们更深入地理解JVM。我们平常说的JVM其实更多说的是HotSpot（HotSpot是JVM规范的一种实现），但我们常常将HotSpot与JVM等同起来。正因对于JVM规范认识的不足，所以我专门准备一个系列的文章，带着大家读一读JVM规范。</p>
 <h4 id="1-1、定义与概念"><a href="#1-1、定义与概念" class="headerlink" title="1.1、定义与概念:"></a>1.1、定义与概念:</h4><p>java 虚拟机规范详细定义了 JVM 的体系结构、指令集、寄存器集合、类文件格式、内存管理、垃圾回收等诸多方面的内容。它就像是 JVM 的 “宪法”，规定了 JVM 应该如何运行以及如何处理各种情况。</p>
 <a id="more"></a>
 
@@ -468,8 +468,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/04/11/2020-04-11-java-thread/" rel="next" title="java-thread">
-                <i class="fa fa-chevron-left"></i> java-thread
+              <a href="/2020/04/09/2020-04-09-Linux-thread/" rel="next" title="Linux-thread">
+                <i class="fa fa-chevron-left"></i> Linux-thread
               </a>
             
           </div>
@@ -478,8 +478,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/04/12/2020-04-12-线程池/" rel="prev" title="线程池">
-                线程池 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/04/11/2020-04-11-java-thread/" rel="prev" title="java-thread">
+                java-thread <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -559,7 +559,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">82</span>
+                  <span class="site-state-item-count">85</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -570,7 +570,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-count">52</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
