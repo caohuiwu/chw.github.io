@@ -79,22 +79,22 @@
 
 
 
-<meta name="description" content="一、JAVA 虚拟机编译Java 虚拟机是为了支持 Java 语言而的设计的。Oracle 的 JDK 包括两部分内容：一部分是将 Java 源代码编译成 Java 虚拟机的指令集的编译器，另一部分是用于 Java 虚拟机的运行时环境。理解编译器是如何与 Java 虚拟机协同工作的，对编译器开发人员来说很有好处，同样也有助于理解 Java 虚拟机本身。">
+<meta name="description" content="这是Java虚拟机规范系列的第三篇文章，主要介绍的是虚拟机规范中的虚拟机编译过程、编译原理。一、JAVA 虚拟机编译Java 虚拟机是为了支持 Java 语言而的设计的。Oracle 的 JDK 包括两部分内容：一部分是将 Java 源代码编译成 Java 虚拟机的指令集的编译器，另一部分是用于 Java 虚拟机的运行时环境。理解编译器是如何与 Java 虚拟机协同工作的，对编译器开发人员来说很有">
 <meta name="keywords" content="java">
 <meta property="og:type" content="article">
 <meta property="og:title" content="《Java》Java虚拟机编译">
 <meta property="og:url" content="http://yoursite.com/2020/04/14/2020-04-14-java-虚拟机规范-Java虚拟机编译/index.html">
 <meta property="og:site_name" content="CHW&#39;s Notes">
-<meta property="og:description" content="一、JAVA 虚拟机编译Java 虚拟机是为了支持 Java 语言而的设计的。Oracle 的 JDK 包括两部分内容：一部分是将 Java 源代码编译成 Java 虚拟机的指令集的编译器，另一部分是用于 Java 虚拟机的运行时环境。理解编译器是如何与 Java 虚拟机协同工作的，对编译器开发人员来说很有好处，同样也有助于理解 Java 虚拟机本身。">
+<meta property="og:description" content="这是Java虚拟机规范系列的第三篇文章，主要介绍的是虚拟机规范中的虚拟机编译过程、编译原理。一、JAVA 虚拟机编译Java 虚拟机是为了支持 Java 语言而的设计的。Oracle 的 JDK 包括两部分内容：一部分是将 Java 源代码编译成 Java 虚拟机的指令集的编译器，另一部分是用于 Java 虚拟机的运行时环境。理解编译器是如何与 Java 虚拟机协同工作的，对编译器开发人员来说很有">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2020/04/14/2020-04-14-java-虚拟机规范-Java虚拟机编译/%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/14/2020-04-14-java-虚拟机规范-Java虚拟机编译/Java%E8%AF%AD%E8%A8%80%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/14/2020-04-14-java-虚拟机规范-Java虚拟机编译/%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/14/2020-04-14-java-虚拟机规范-Java虚拟机编译/%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png">
-<meta property="og:updated_time" content="2024-12-10T09:01:26.411Z">
+<meta property="og:updated_time" content="2024-12-16T13:19:32.625Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Java》Java虚拟机编译">
-<meta name="twitter:description" content="一、JAVA 虚拟机编译Java 虚拟机是为了支持 Java 语言而的设计的。Oracle 的 JDK 包括两部分内容：一部分是将 Java 源代码编译成 Java 虚拟机的指令集的编译器，另一部分是用于 Java 虚拟机的运行时环境。理解编译器是如何与 Java 虚拟机协同工作的，对编译器开发人员来说很有好处，同样也有助于理解 Java 虚拟机本身。">
+<meta name="twitter:description" content="这是Java虚拟机规范系列的第三篇文章，主要介绍的是虚拟机规范中的虚拟机编译过程、编译原理。一、JAVA 虚拟机编译Java 虚拟机是为了支持 Java 语言而的设计的。Oracle 的 JDK 包括两部分内容：一部分是将 Java 源代码编译成 Java 虚拟机的指令集的编译器，另一部分是用于 Java 虚拟机的运行时环境。理解编译器是如何与 Java 虚拟机协同工作的，对编译器开发人员来说很有">
 <meta name="twitter:image" content="http://yoursite.com/2020/04/14/2020-04-14-java-虚拟机规范-Java虚拟机编译/%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B.png">
 
 
@@ -379,7 +379,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.1k
+                  2.2k
                 </span>
               
 
@@ -416,7 +416,7 @@
       
 
       
-        <h3 id="一、JAVA-虚拟机编译"><a href="#一、JAVA-虚拟机编译" class="headerlink" title="一、JAVA 虚拟机编译"></a>一、JAVA 虚拟机编译</h3><p>Java 虚拟机是为了支持 Java 语言而的设计的。Oracle 的 JDK 包括两部分内容：一部分是将 Java 源代码编译成 Java 虚拟机的指令集的编译器，另一部分是用于 Java 虚拟机的运行时环境。理解编译器是如何与 Java 虚拟机协同工作的，对编译器开发人员来说很有好处，同样也有助于理解 Java 虚拟机本身。</p>
+        <pre><code>这是Java虚拟机规范系列的第三篇文章，主要介绍的是虚拟机规范中的虚拟机编译过程、编译原理。</code></pre><h3 id="一、JAVA-虚拟机编译"><a href="#一、JAVA-虚拟机编译" class="headerlink" title="一、JAVA 虚拟机编译"></a>一、JAVA 虚拟机编译</h3><p>Java 虚拟机是为了支持 Java 语言而的设计的。Oracle 的 JDK 包括两部分内容：一部分是将 Java 源代码编译成 Java 虚拟机的指令集的编译器，另一部分是用于 Java 虚拟机的运行时环境。理解编译器是如何与 Java 虚拟机协同工作的，对编译器开发人员来说很有好处，同样也有助于理解 Java 虚拟机本身。</p>
 <a id="more"></a>
 
 
@@ -593,7 +593,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">85</span>
+                  <span class="site-state-item-count">92</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -604,7 +604,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">52</span>
+                  <span class="site-state-item-count">73</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>

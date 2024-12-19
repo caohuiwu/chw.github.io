@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这是Java虚拟机规范系列的第八篇文章，主要介绍的是虚拟机规范中的“运行时数据区”的hotspot实现。一、引言在具体讨论JVM的内存结构时，还应该指出，我们通常讨论的都是虚拟机中的实现，这些模型并不是所有虚拟机通用的，比如“Perm Gen（永久代）”就是HotSpot中的概念，JRockit中并没有永久代。 此外，不应该把“永久代”和“方法区”混为一谈，永久代（Perm Gen）只是HotSp">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Java》运行时数据区（hotspot实现）">
+<meta property="og:url" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/index.html">
+<meta property="og:site_name" content="CHW&#39;s Notes">
+<meta property="og:description" content="这是Java虚拟机规范系列的第八篇文章，主要介绍的是虚拟机规范中的“运行时数据区”的hotspot实现。一、引言在具体讨论JVM的内存结构时，还应该指出，我们通常讨论的都是虚拟机中的实现，这些模型并不是所有虚拟机通用的，比如“Perm Gen（永久代）”就是HotSpot中的概念，JRockit中并没有永久代。 此外，不应该把“永久代”和“方法区”混为一谈，永久代（Perm Gen）只是HotSp">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/JDK6.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/%E5%A0%86.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/JDK7.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/JDK8.png">
+<meta property="og:updated_time" content="2024-12-18T01:19:22.995Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Java》运行时数据区（hotspot实现）">
+<meta name="twitter:description" content="这是Java虚拟机规范系列的第八篇文章，主要介绍的是虚拟机规范中的“运行时数据区”的hotspot实现。一、引言在具体讨论JVM的内存结构时，还应该指出，我们通常讨论的都是虚拟机中的实现，这些模型并不是所有虚拟机通用的，比如“Perm Gen（永久代）”就是HotSpot中的概念，JRockit中并没有永久代。 此外，不应该把“永久代”和“方法区”混为一谈，永久代（Perm Gen）只是HotSp">
+<meta name="twitter:image" content="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/JDK6.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/">
+
+
+
+
+
+  <title>《Java》运行时数据区（hotspot实现） | CHW's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CHW's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-fa fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chw">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CHW's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Java》运行时数据区（hotspot实现）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-19T12:19:31+08:00">
+                2020-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/jvm/" itemprop="url" rel="index">
+                    <span itemprop="name">jvm</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/jvm/虚拟机规范/" itemprop="url" rel="index">
+                    <span itemprop="name">虚拟机规范</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/jvm/虚拟机规范/Java虚拟机结构/" itemprop="url" rel="index">
+                    <span itemprop="name">Java虚拟机结构</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/jvm/虚拟机规范/Java虚拟机结构/hotspot实现/" itemprop="url" rel="index">
+                    <span itemprop="name">hotspot实现</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.4k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>这是Java虚拟机规范系列的第八篇文章，主要介绍的是虚拟机规范中的“运行时数据区”的hotspot实现。</code></pre><h1 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h1><p>在具体讨论JVM的内存结构时，还应该指出，我们通常讨论的都是虚拟机中的实现，这些模型并不是所有虚拟机通用的，比如“Perm Gen（永久代）”就是HotSpot中的概念，JRockit中并没有永久代。</p>
+<p>此外，不应该把“永久代”和“方法区”混为一谈，永久代（Perm Gen）只是HotSpot对于Java虚拟机规范中方法区（Method Area）的一种实现，后来被改成了元空间（MetaSpace），文中会具体介绍这些变化。</p>
+<a id="more"></a>
+
+
+<h1 id="二、Hotspot-VM的内存模型变迁"><a href="#二、Hotspot-VM的内存模型变迁" class="headerlink" title="二、Hotspot VM的内存模型变迁"></a>二、Hotspot VM的内存模型变迁</h1><h2 id="JDK-1-6的内存结构"><a href="#JDK-1-6的内存结构" class="headerlink" title="JDK 1.6的内存结构"></a>JDK 1.6的内存结构</h2><p><img src="/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/JDK6.png" alt="JDK6"></p>
+<h3 id="堆-（heap）"><a href="#堆-（heap）" class="headerlink" title="堆 （heap）"></a>堆 （heap）</h3><p>下图是HotSpot VM 的堆空间内存划分。分为新生代、老年代和永久代</p>
+<ul>
+<li><strong>新生代：</strong> Hotspot虚拟机将新生代进一步划分为Eden区和两个Survivor区（S0和S1）<ul>
+<li><strong>Eden区：</strong> 大多数新对象在Eden区中分配，如果Eden区空间不足时，将触发一次Minor GC。</li>
+<li><strong>Survivor区：</strong> Eden区中的存活对象会被复制到Survivor区（S0或S1），两个Survivor区交替使用。每次Minor GC后，存活的对象从一个Survivor区复制到另一个Survivor区或老年代。</li>
+<li><strong>eden:survivor-to:survivor-from=8:1:1</strong></li>
+</ul>
+</li>
+<li><strong>老年代：</strong> 老年代存放生命周期较长的对象，当对象在新生代中经过多次GC后仍然存活，就会被移动到老年代。老年代的空间相对较大，垃圾回收频率低，但是回收时间较长。老年代主要采用Major GC或Full GC来进行垃圾回收。</li>
+<li><strong>永久代：</strong> 在Java 7及之前的版本中，Hotspot虚拟机使用永久代来存放类的元数据、常量池、静态变量等。永久代的大小是固定的，容易导致内存溢出问题。</li>
+</ul>
+<p><img src="/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/%E5%A0%86.png" alt="堆"></p>
+<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>它存储了每一个类的结构信息，例如运行时常量池（Runtime Constant Pool）、字段和方法数据、构造函数和普通方法的字节码内容、还包括一些在类、实例、接口初始化时用到的特殊方法。</p>
+<blockquote>
+<p><strong>运行时常量池：</strong> 运行时常量池是方法区的一部分，它是在类加载后，从类文件中的常量池表解析得到的。<font color="#e98787">它存储了各种字面量和符号引用</font>，这些内容在程序运行过程中发挥重要作用，比如用于方法调用、字段访问等操作的解析。</p>
+<p><strong>字符串常量池：</strong>  字符串常量池是运行时常量池的一个重要组成部分，专门用于存储字符串字面量。在 Java 中，为了提高性能和节省内存，相同的字符串字面量在字符串常量池中只会存储一份。例如，在代码String s1 = “abc”; String s2 = “abc”;中，s1和s2实际上都指向字符串常量池中同一个”abc”字符串对象。</p>
+</blockquote>
+<p>在JDK1.6中，永久代（Perm Gen）作为<font color="red"> “方法区（Method area）”</font>的实现，这里保存着类的静态变量（Class statics），字符串常量池（String Table），符号引用（Symbols）和字面量（Interned Strings）。</p>
+<p>这个时期的永久代和堆是相邻的，使用连续的物理内存，但是内存空间是隔离的。</p>
+<p>永久代的垃圾收集是和老年代捆绑在一起的，因此无论谁满了，都会触发永久代和老年代的垃圾收集。</p>
+<p>永久代的内存受到Java虚拟机的管理。</p>
+<h2 id="JDK-1-7的内存结构"><a href="#JDK-1-7的内存结构" class="headerlink" title="JDK 1.7的内存结构"></a>JDK 1.7的内存结构</h2><p>在JDK1.7中，Perm Gen的数据开始向Java Heap和Native Heap转移：</p>
+<ul>
+<li><strong>字符串常量池（String Table）</strong> 转移到了Java Heap</li>
+<li><strong>字面量（Interned Strings）</strong> 转移到了Java Heap</li>
+<li><strong>类的静态变量（Class Statics）</strong> 转移到了Java Heap</li>
+<li><strong>符号引用（Symbols）</strong> 转移到了Native Heap</li>
+</ul>
+<p><img src="/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/JDK7.png" alt="JDK7"></p>
+<p>Java Heap和Native Heap有什么区别？</p>
+<ul>
+<li>Native Heap是操作系统层面的堆区，是JVM进程运行时动态向操作系统申请的内存空间。JVM会在Native Heap中划出一块区域作为Java Heap(也有JVM Heap的说法，本文使用官网的名词)。Java Heap就是Java虚拟机规范里面的Heap。</li>
+</ul>
+<p>为什么要转移永久代的数据？</p>
+<blockquote>
+<p>因为通常使用PermSize和MaxPermSize设置永久代的大小就决定了永久代的上限，容易遇到OOM，比如使用动态代理时，需要大量加载类文件，这时候很容易就发生java.lang.OutOfMemoryError: PermGen Space的异常。</p>
+</blockquote>
+<p>为了减少永久代的压力，因此JDK1.7开始把数据向堆和本地内存迁移。</p>
+<h2 id="JDK18-metaspace成为method-area的实现"><a href="#JDK18-metaspace成为method-area的实现" class="headerlink" title="JDK18-metaspace成为method-area的实现"></a>JDK18-metaspace成为method-area的实现</h2><p>到了JDK1.8，HotSpot直接使用MetaSpace取代了Perm Gen。 自此，HotSpot虚拟机中不再有Perm Gen（永久代），只有MetaSpace（元空间）。<br><img src="/2020/04/19/2020-04-19-java-虚拟机规范-运行时数据区hotspot实现/JDK8.png" alt="JDK8"><br>下面直接贴一段Oracle的官方资料中对MetaSpace的描述：   </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- JDK 8 does not have Permanent Generation</span><br><span class="line">- Class metadata is stored in a new space called Metaspace</span><br><span class="line">- Not contiguous with the Java Heap</span><br><span class="line">- Metaspace is allocated out of native memory</span><br><span class="line">- Maximum space available to the Metaspace is the available system memory</span><br><span class="line">- This can though be limited by MaxMetaspaceSize JVM option</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，元空间对比老年代有很多优点，它不再和Java Heap使用相邻的物理内存，直接从本地内存分配空间，元空间大小的上限受限于系统的内存大小，因此发生OOM的概率可以大大降低。当然，我们还是可以使用MaxMetaspaceSize选项来限制MetaSpace的大小。</p>
+<hr>
+<p>参考文章：<br><a href="https://blog.csdn.net/HD243608836/article/details/126635394" target="_blank" rel="noopener">从Java的《jvm虚拟机规范》看HotSpot虚拟机的内存结构和变迁</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/18/2020-04-18-java-虚拟机规范-对象/" rel="next" title="《Java》对象">
+                <i class="fa fa-chevron-left"></i> 《Java》对象
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/20/2020-04-20-java-虚拟机规范-垃圾回收/" rel="prev" title="《Java》垃圾回收">
+                《Java》垃圾回收 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/touxiang.jpg" alt="chw">
+            
+              <p class="site-author-name" itemprop="name">chw</p>
+              <p class="site-description motion-element" itemprop="description">do somthing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">92</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">35</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、引言"><span class="nav-text">一、引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、Hotspot-VM的内存模型变迁"><span class="nav-text">二、Hotspot VM的内存模型变迁</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK-1-6的内存结构"><span class="nav-text">JDK 1.6的内存结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#堆-（heap）"><span class="nav-text">堆 （heap）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法区"><span class="nav-text">方法区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK-1-7的内存结构"><span class="nav-text">JDK 1.7的内存结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK18-metaspace成为method-area的实现"><span class="nav-text">JDK18-metaspace成为method-area的实现</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chw</span>
+
+
+       <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

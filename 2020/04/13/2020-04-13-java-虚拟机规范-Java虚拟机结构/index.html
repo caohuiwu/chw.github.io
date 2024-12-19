@@ -89,7 +89,8 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2020/04/13/2020-04-13-java-虚拟机规范-Java虚拟机结构/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/13/2020-04-13-java-虚拟机规范-Java虚拟机结构/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA.png">
-<meta property="og:updated_time" content="2024-12-13T08:06:58.846Z">
+<meta property="og:image" content="http://yoursite.com/2020/04/13/2020-04-13-java-虚拟机规范-Java虚拟机结构/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E6%80%BB%E7%BB%93.png">
+<meta property="og:updated_time" content="2024-12-17T09:00:53.908Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Java》Java虚拟机结构">
 <meta name="twitter:description" content="这是Java虚拟机规范系列的第二篇文章，主要介绍的是虚拟机规范中的虚拟机结构，包含数据类型、运行时数据区、字节码指令集等内容。0 Java虚拟机结构 纲领Java虚拟机规范中的虚拟机结构相关章节细节如下：  .highlight.plain {     height:400px; }  12345678910111213141516171819202122232425262728293031323">
@@ -377,7 +378,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  4k
+                  4.3k
                 </span>
               
 
@@ -393,7 +394,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  14
+                  15
                 </span>
               
             </div>
@@ -428,7 +429,7 @@
 <li>引用类型：与之对应的数据值叫做“引用值”。</li>
 </ul>
 <p><img src="/2020/04/13/2020-04-13-java-虚拟机规范-Java虚拟机结构/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B.png" alt="数据类型"></p>
-<h3 id="2-运行时数据区"><a href="#2-运行时数据区" class="headerlink" title="2. 运行时数据区"></a>2. 运行时数据区</h3><p>Java 虚拟机定义了若干种程序运行期间会使用到的运行时数据区，其中有一些会随着虚拟机启动而创建，随着虚拟机退出而销毁。另外一些则是与线程一一对应的，这些与线程对应的数据区域会随着线程开始和结束而创建和销毁。</p>
+<h3 id="2-运行时数据区"><a href="#2-运行时数据区" class="headerlink" title="2. 运行时数据区"></a>2. 运行时数据区</h3><p><img src="/2020/04/13/2020-04-13-java-虚拟机规范-Java虚拟机结构/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA.png" alt="运行时数据区"><br>Java 虚拟机规范定义了若干种程序运行期间会使用到的运行时数据区，其中有一些会随着虚拟机启动而创建，随着虚拟机退出而销毁。另外一些则是与线程一一对应的，这些与线程对应的数据区域会随着线程开始和结束而创建和销毁。</p>
 <ul>
 <li>PC寄存器</li>
 <li>Java虚拟机栈</li>
@@ -437,7 +438,6 @@
 <li>运行时常量池</li>
 <li>本地方法栈</li>
 </ul>
-<p><img src="/2020/04/13/2020-04-13-java-虚拟机规范-Java虚拟机结构/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA.png" alt="运行时数据区"></p>
 <h4 id="2-1-PC寄存器"><a href="#2-1-PC寄存器" class="headerlink" title="2.1 PC寄存器"></a>2.1 PC寄存器</h4><p>Java 虚拟机可以支持多条线程同时执行（可参考《Java 语言规范》第 17 章），每一条 Java虚拟机线程都有自己的 PC（Program Counter）寄存器。在任意时刻，一条 Java 虚拟机线程只会执行一个方法的代码，这个正在被线程执行的方法称为该线程的当前方法（CurrentMethod，§2.6）。如果这个方法不是 native 的，那 PC 寄存器就保存 Java 虚拟机正在执行的字节码指令的地址，如果该方法是 native 的，那 PC 寄存器的值是 undefined。PC 寄存器的容量至少应当能保存一个 returnAddress 类型的数据或者一个与平台相关的本地指针的值。</p>
 <h4 id="2-2-Java虚拟机栈"><a href="#2-2-Java虚拟机栈" class="headerlink" title="2.2 Java虚拟机栈"></a>2.2 Java虚拟机栈</h4><p>每一条 Java 虚拟机线程都有自己私有的 Java 虚拟机栈（Java Virtual Machine Stack） ，这个栈与线程同时创建，用于存储栈帧（Frames）。</p>
 <h5 id="2-2-1-栈桢"><a href="#2-2-1-栈桢" class="headerlink" title="2.2.1 栈桢"></a>2.2.1 栈桢</h5><h6 id="定义和作用"><a href="#定义和作用" class="headerlink" title="定义和作用"></a>定义和作用</h6><p>栈帧（Frame）是用来存储数据和部分过程结果的数据结构，同时也被用来处理动态链接（Dynamic Linking）、方法返回值和异常分派（Dispatch Exception）。</p>
@@ -509,6 +509,13 @@
 <li>如果线程请求分配的栈容量超过本地方法栈允许的最大容量时，Java 虚拟机将会抛出一个StackOverflowError 异常。</li>
 <li>如果本地方法栈可以动态扩展，并且扩展的动作已经尝试过，但是目前无法申请到足够的内存去完成扩展，或者在建立新的线程时没有足够的内存去创建对应的本地方法栈，那 Java 虚拟机将会抛出一个 OutOfMemoryError 异常。</li>
 </ul>
+<h4 id="2-6、运行时常量池"><a href="#2-6、运行时常量池" class="headerlink" title="2.6、运行时常量池"></a>2.6、运行时常量池</h4><p>运行时常量池（Runtime Constant Pool）是每一个类或接口的常量池（Constant_Pool）的运行时表示形式，它包括了若干种不同的常量：从编译期可知的数值字面量到必须运行期解析后才能获得的方法或字段引用。运行时常量池扮演了类似传统语言中符号表（Symbol Table）的角色，不过它存储数据范围比通常意义上的符号表要更为广泛。</p>
+<p><strong>每一个运行时常量池都分配在<font color="red"> Java 虚拟机的方法区</font>之中</strong>，在类和接口被加载到虚拟机后，对应的运行时常量池就被创建出来。</p>
+<p>在创建类和接口的运行时常量池时，可能会发生如下异常情况：</p>
+<ul>
+<li>当创建类或接口的时候，如果构造运行时常量池所需要的内存空间超过了方法区所能提供的最大值，那 Java 虚拟机将会抛出一个 OutOfMemoryError 异常。<br>关于构造运行时常量池的详细信息，可以参考“加载、链接和初始化”的内容。</li>
+</ul>
+<p><strong>总结：</strong><br><img src="/2020/04/13/2020-04-13-java-虚拟机规范-Java虚拟机结构/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA%E6%80%BB%E7%BB%93.png" alt="运行时数据区总结"></p>
 <h3 id="3-对象的表示"><a href="#3-对象的表示" class="headerlink" title="3. 对象的表示"></a>3. 对象的表示</h3><p>Java 虚拟机规范不强制规定对象的内部结构应当如何表示①。</p>
 <blockquote>
 <p>在一些 Oracle 的 Java 虚拟机实现中，指向对象实例的引用是一个指向句柄的指针，这个句柄包含两部分<br>信心，一部分是指向这个对象所包括的方法表以及指向这个对象所属类相关的信息；另一部分是指向在堆中分配的<br>对象实例数据。（译者注：这条注释在 10 多年前出版的 Java 虚拟机规范第二版中就已经存在，第三版中仅仅是将<br>Sun 修改为 Oracle 而已，所表达的实际信息已比较陈旧。在 HotSpot 虚拟机中，指向对象的引用并不通过句柄，<br>而是直接指向堆中对象的实例数据，因此 HotSpot 虚拟机并不包括在上面所描述的“一些 Oracle 的 Java 虚拟<br>机实现”范围之内）</p>
@@ -679,7 +686,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">85</span>
+                  <span class="site-state-item-count">92</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -690,7 +697,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">52</span>
+                  <span class="site-state-item-count">73</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -734,7 +741,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0-Java虚拟机结构-纲领"><span class="nav-text">0 Java虚拟机结构 纲领</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-数据类型"><span class="nav-text">1. 数据类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-运行时数据区"><span class="nav-text">2. 运行时数据区</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-PC寄存器"><span class="nav-text">2.1 PC寄存器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Java虚拟机栈"><span class="nav-text">2.2 Java虚拟机栈</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-1-栈桢"><span class="nav-text">2.2.1 栈桢</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#定义和作用"><span class="nav-text">定义和作用</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#创建-amp-销毁"><span class="nav-text">创建&amp;销毁</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#结构"><span class="nav-text">结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-堆"><span class="nav-text">2.3. 堆</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-方法区"><span class="nav-text">2.4. 方法区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-本地方法栈"><span class="nav-text">2.5. 本地方法栈</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-对象的表示"><span class="nav-text">3. 对象的表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-字节码指令集"><span class="nav-text">4. 字节码指令集</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#加载和存储指令"><span class="nav-text">加载和存储指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#运算指令"><span class="nav-text">运算指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#类型转换指令"><span class="nav-text">类型转换指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#对象创建与操作"><span class="nav-text">对象创建与操作</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#操作数栈管理指令"><span class="nav-text">操作数栈管理指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方法调用和返回指令"><span class="nav-text">方法调用和返回指令</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#5-同步"><span class="nav-text">5. 同步</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0-Java虚拟机结构-纲领"><span class="nav-text">0 Java虚拟机结构 纲领</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-数据类型"><span class="nav-text">1. 数据类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-运行时数据区"><span class="nav-text">2. 运行时数据区</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-PC寄存器"><span class="nav-text">2.1 PC寄存器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Java虚拟机栈"><span class="nav-text">2.2 Java虚拟机栈</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-1-栈桢"><span class="nav-text">2.2.1 栈桢</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#定义和作用"><span class="nav-text">定义和作用</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#创建-amp-销毁"><span class="nav-text">创建&amp;销毁</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#结构"><span class="nav-text">结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-堆"><span class="nav-text">2.3. 堆</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-方法区"><span class="nav-text">2.4. 方法区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-本地方法栈"><span class="nav-text">2.5. 本地方法栈</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6、运行时常量池"><span class="nav-text">2.6、运行时常量池</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-对象的表示"><span class="nav-text">3. 对象的表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-字节码指令集"><span class="nav-text">4. 字节码指令集</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#加载和存储指令"><span class="nav-text">加载和存储指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#运算指令"><span class="nav-text">运算指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#类型转换指令"><span class="nav-text">类型转换指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#对象创建与操作"><span class="nav-text">对象创建与操作</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#操作数栈管理指令"><span class="nav-text">操作数栈管理指令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#方法调用和返回指令"><span class="nav-text">方法调用和返回指令</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#5-同步"><span class="nav-text">5. 同步</span></a></li></div>
             
 
           </div>
