@@ -1,9 +1,8 @@
 ---
 title: 《Java》JMM之“volatile”
-date: 2020-04-21 12:19:31
+date: 2020-05-11 12:19:31
 categories:
   - [ java, jvm, 虚拟机规范, jmm, volatile ]
-tags: 虚拟机启动 
 ---
 
 	这是Java内存模型（JMM）系列的第二篇文章，主要介绍的是volatile特性。
@@ -45,17 +44,17 @@ public class VolatileDemo {
 ### 2.2.1、字段标志
 volatile关键字JVM是如何知晓的呢：0 getstatic #2 <com/chw/java基础/volatiletest/VolatileDemo.i : I> <font color=red>通过常量池#2的flags</font>
 - 字段标志为：ACC_VOLATILE（0x0040 [private:0x0002 static:0x0008 volatile:0x0040]
-![字节码_字段标志](2020-04-21-java-虚拟机规范-volatile/字节码_字段标志.png)
+![字节码_字段标志](2020-05-11-java-虚拟机规范-volatile/字节码_字段标志.png)
 
 ### 2.2.2、方法字节码
-![字节码_方法](2020-04-21-java-虚拟机规范-volatile/字节码_方法.png)
+![字节码_方法](2020-05-11-java-虚拟机规范-volatile/字节码_方法.png)
 - getstatic是用于获取类的静态变量的值，并将其压入操作数栈。
 - putstatic是一条用于设置类的静态变量（static field）值的指令。它会从操作数栈中弹出一个值，并将这个值赋给指定类的静态变量。
 - iconst_1是一条将整数常量 1 压入操作数栈的指令。
 - iadd是 Java 虚拟机字节码指令集中的一条指令，用于执行整数加法操作。它会从操作数栈（Operand Stack）中弹出两个整数，将这两个整数相加，然后把结果再压入操作数栈。
 
 ## 2.3、⭐️汇编代码层面
-![汇编代码](2020-04-21-java-虚拟机规范-volatile/汇编代码.png)
+![汇编代码](2020-05-11-java-虚拟机规范-volatile/汇编代码.png)
 ```dtd
 运行时添加参数:-XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly
 ```
@@ -176,7 +175,7 @@ inline void OrderAccess::fence() {
 <font color=gray>禁止重排序是怎么实现的呢？</font>				
 - jvm执行字节码文件时，遇到volatile相关数据，JVM是如何解析的呢？
 	- BytecodeInterpreter（字节码解释器）是 Java 虚拟机（JVM）中用于解释执行字节码的关键组件。
-	  ![BytecodeInterpreter](2020-04-21-java-虚拟机规范-volatile/BytecodeInterpreter.png)
+	  ![BytecodeInterpreter](2020-05-11-java-虚拟机规范-volatile/BytecodeInterpreter.png)
 > 工作原理
 > 	读取字节码
 >		BytecodeInterpreter 从类加载器加载的字节码文件中按顺序读取字节码指令。
@@ -221,7 +220,7 @@ inline void OrderAccess::fence() {
 
 ## 3.2、处理器重排序和内存屏障指令
 背景：现代CPU，都有高速缓冲区，用于提高性能。如下图：
-![CPU缓存](2020-04-21-java-虚拟机规范-volatile/CPU缓存.png)
+![CPU缓存](2020-05-11-java-虚拟机规范-volatile/CPU缓存.png)
 带来的问题：由于写缓冲区仅对自己的处理器可见，处理器重排序，它会导致处理器执行内存操作的顺序可能会与内存实际的操作执行顺序不一致。
 
 ### 3.2.1、解决方案
@@ -239,12 +238,12 @@ JMM 内存屏障是 Java 虚拟机（JVM）为了实现 Java 内存模型所定�
 
 - 作用：为了保证内存可见性，java 编译器在生成指令序列的适当位置会插入内存屏障指令来禁止特定类型的处理器重排序。
 - 分类：JMM 把内存屏障指令分为下列四类：
-- ![jmm内存屏障](2020-04-21-java-虚拟机规范-volatile/jmm内存屏障.png)
-  - ![jmm内存屏障Java实现](2020-04-21-java-虚拟机规范-volatile/jmm内存屏障Java实现.png)
+- ![jmm内存屏障](2020-05-11-java-虚拟机规范-volatile/jmm内存屏障.png)
+  - ![jmm内存屏障Java实现](2020-05-11-java-虚拟机规范-volatile/jmm内存屏障Java实现.png)
 
 与 CPU 内存屏障的关系：
 > JMM 内存屏障是基于 CPU 内存屏障实现的，但它是一种更高层次的抽象。JVM 在字节码执行过程中，根据 Java 程序的语义（如volatile关键字、synchronized关键字等的使用），会在适当的位置插入 JMM 内存屏障。这些 JMM 内存屏障在底层可能会通过 CPU 内存屏障或者其他硬件和软件机制来实现。例如，当 JVM 识别到对volatile变量的写操作时，会在字节码层面插入相应的内存屏障，这些内存屏障在不同的硬件平台上可能会转化为不同的 CPU 内存屏障操作，以确保volatile变量的写操作对其他线程是可见的。
-> - 如下图所示：JVM定义的4个内存屏障指令，底层实现是lock汇编指令 ![OrderAccess_linux_x86](2020-04-21-java-虚拟机规范-volatile/OrderAccess_linux_x86.png)
+> - 如下图所示：JVM定义的4个内存屏障指令，底层实现是lock汇编指令 ![OrderAccess_linux_x86](2020-05-11-java-虚拟机规范-volatile/OrderAccess_linux_x86.png)
 
 - 
 
@@ -253,7 +252,7 @@ JMM 内存屏障是 Java 虚拟机（JVM）为了实现 Java 内存模型所定�
 ## 3.3、对象创建过程的重排序
 
 ### 3.3.1、对象的创建过程：
-![对象创建过程](2020-04-21-java-虚拟机规范-volatile/对象创建过程.png)
+![对象创建过程](2020-05-11-java-虚拟机规范-volatile/对象创建过程.png)
 - 分配内存
 - 初始化零值
 
@@ -277,7 +276,7 @@ class Singleton {
 ```
 - 在这种实现方式中，存在一个潜在的问题，就是对象创建过程中的重排序。`instance = new Singleton();`这一语句在字节码层面包含了多个操作：分配内存、初始化零值、设置对象头和执行`<init>`方法。由于编译器和处理器可能会对这些操作进行重排序，可能会出现一种情况：分配内存和设置对象头后，对象引用就被赋值给`instance`，但此时`<init>`方法还没有执行完，对象还没有完全初始化（外部获取对象的数据是默认值）。
 - 懒汉单例字节码
-![懒汉单例_字节码](2020-04-21-java-虚拟机规范-volatile/懒汉单例_字节码.png)
+![懒汉单例_字节码](2020-05-11-java-虚拟机规范-volatile/懒汉单例_字节码.png)
 > **分配内存<font color=green>（字节码层面没有直接体现）</font>**
 在字节码中并没有直接对应的指令来表示分配内存这一动作。这是因为内存分配是由 Java 虚拟机（JVM）在底层自动完成的，它是一个比较复杂的过程，涉及到 Java 堆（Heap）的管理机制，如指针碰撞（Bump - the - Pointer）或者空闲列表（Free - List）方式。<font color=#e98787>当 JVM 执行new指令时，它会触发内存分配的操作</font>，但字节码本身不会展示具体如何分配内存。
 > 
@@ -328,7 +327,7 @@ public class Singleton {
 
 # 四. 不保证原子性
 对任意单个volatile变量的读/写操作具有原子性，但是对volatile++这种复合操作不具有原子性
-![volatile原子性示例](2020-04-21-java-虚拟机规范-volatile/volatile原子性示例.png)
+![volatile原子性示例](2020-05-11-java-虚拟机规范-volatile/volatile原子性示例.png)
 - 在这里，`counter`是一个`volatile`变量，`increment`方法尝试对其进行自增操作。从表面上看，似乎这个操作应该是安全的，但实际上，`counter++`这个操作不是原子操作。
 	- 这个操作在字节码层面包含了多个步骤：
 		- 首先，通过`getstatic`指令从内存（因为`volatile`属性，每次都从主内存读取）获取`counter`的值。
