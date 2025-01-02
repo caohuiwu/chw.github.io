@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2020/04/20/2020-04-20-java-虚拟机规范-垃圾回收/Reference%E7%9A%84%E5%9B%9E%E6%94%B6%E8%BF%87%E7%A8%8B.png">
 <meta property="og:image" content="http://yoursite.com/2020/04/20/2020-04-20-java-虚拟机规范-垃圾回收/%E5%B9%B6%E5%8F%91%E5%87%BA%E7%8E%B0%E5%AF%B9%E8%B1%A1%E6%B6%88%E5%A4%B1%E9%97%AE%E9%A2%98%E7%A4%BA%E6%84%8F.png">
-<meta property="og:updated_time" content="2024-12-19T03:33:00.882Z">
+<meta property="og:updated_time" content="2025-01-01T08:24:27.368Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Java》垃圾回收">
 <meta name="twitter:description" content="这是Java虚拟机规范系列的第九篇文章，主要介绍的是虚拟机规范中的垃圾回收的hotspot实现。一、垃圾回收对于垃圾回收，规范并没有像字节码执行那样详细地规定具体的算法和操作流程。">
@@ -377,7 +377,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  5.9k
+                  6k
                 </span>
               
 
@@ -457,8 +457,10 @@
 
 <p>会将软应用对象存入queue</p>
 <h5 id="使用场景："><a href="#使用场景：" class="headerlink" title="使用场景："></a>使用场景：</h5><p>高速缓存</p>
-<h4 id="弱引用（WeakReference）"><a href="#弱引用（WeakReference）" class="headerlink" title="弱引用（WeakReference）"></a>弱引用（WeakReference）</h4><p>非必须对象<br>被弱引用关联的对象只 能生存到下一次垃圾收集发生为止。当垃圾收集器开始工作，无论当前内存是否足够，都会回收掉只 被弱引用关联的对象。在JDK 1.2版之后提供了WeakReference类来实现弱引用。</p>
+<h4 id="弱引用（WeakReference）"><a href="#弱引用（WeakReference）" class="headerlink" title="弱引用（WeakReference）"></a>弱引用（WeakReference）</h4><p>非必须对象<br>被弱引用关联的对象只能生存到下一次垃圾收集发生为止。当垃圾收集器开始工作，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。在JDK 1.2版之后提供了WeakReference类来实现弱引用。</p>
 <h5 id="使用场景：-1"><a href="#使用场景：-1" class="headerlink" title="使用场景："></a>使用场景：</h5><p>ThreadLocal使用了弱引用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ThreadLocal类，内部有个静态内部类ThreadLocalMap</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadLocal</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">//ThreadLocal静态内部类ThreadLocalMap，Entry[]数组，而Entry继承了虚引用</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadLocalMap</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> Entry[] table;</span><br><span class="line">        <span class="comment">//Entry继承了弱引用，该弱引用关联了ThreadLocal对象。</span></span><br><span class="line">        <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Entry</span> <span class="keyword">extends</span> <span class="title">WeakReference</span>&lt;<span class="title">ThreadLocal</span>&lt;?&gt;&gt; </span>&#123;</span><br><span class="line">            Object value;</span><br><span class="line">            Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">                <span class="keyword">super</span>(k);</span><br><span class="line">                value = v;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">private</span> Entry <span class="title">getEntry</span><span class="params">(ThreadLocal&lt;?&gt; key)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">int</span> i = key.threadLocalHashCode &amp; (table.length - <span class="number">1</span>);</span><br><span class="line">            Entry e = table[i];</span><br><span class="line">            <span class="keyword">if</span> (e != <span class="keyword">null</span> &amp;&amp; e.get() == key)</span><br><span class="line">                <span class="keyword">return</span> e;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> getEntryAfterMiss(key, i, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h4 id="虚引用（PhantomReference）"><a href="#虚引用（PhantomReference）" class="headerlink" title="虚引用（PhantomReference）"></a>虚引用（PhantomReference）</h4><p>完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 新建一个对象</span></span><br><span class="line">    User obj = <span class="keyword">new</span> User();</span><br><span class="line">    <span class="comment">// 存储被回收的对象</span></span><br><span class="line">    ReferenceQueue&lt;User&gt; QUEUE = <span class="keyword">new</span> ReferenceQueue&lt;&gt;();</span><br><span class="line">    <span class="comment">// phantomReference使用虚引用指向这个内存空间</span></span><br><span class="line">    PhantomReference&lt;User&gt; phantomReference = <span class="keyword">new</span> PhantomReference&lt;&gt;(obj, QUEUE);</span><br><span class="line">    System.out.println(phantomReference.get()); <span class="comment">// 获取不到 打印为null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -708,7 +710,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-count">95</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -719,7 +721,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-count">54</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -730,7 +732,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">33</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -783,7 +785,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
