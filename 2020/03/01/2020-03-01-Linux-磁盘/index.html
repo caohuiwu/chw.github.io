@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一、磁盘1.1、结构 盘片 盘面 扇区   柱面">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Linux》磁盘">
+<meta property="og:url" content="http://yoursite.com/2020/03/01/2020-03-01-Linux-磁盘/index.html">
+<meta property="og:site_name" content="CHW&#39;s Notes">
+<meta property="og:description" content="一、磁盘1.1、结构 盘片 盘面 扇区   柱面">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2020/03/01/2020-03-01-Linux-磁盘/%E7%9B%98%E7%89%87.png">
+<meta property="og:image" content="http://yoursite.com/2020/03/01/2020-03-01-Linux-磁盘/%E7%9B%98%E9%9D%A2.png">
+<meta property="og:image" content="http://yoursite.com/2020/03/01/2020-03-01-Linux-磁盘/%E6%9F%B1%E9%9D%A2.png">
+<meta property="og:updated_time" content="2025-01-08T06:37:47.302Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Linux》磁盘">
+<meta name="twitter:description" content="一、磁盘1.1、结构 盘片 盘面 扇区   柱面">
+<meta name="twitter:image" content="http://yoursite.com/2020/03/01/2020-03-01-Linux-磁盘/%E7%9B%98%E7%89%87.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/03/01/2020-03-01-Linux-磁盘/">
+
+
+
+
+
+  <title>《Linux》磁盘 | CHW's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CHW's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-fa fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/01/2020-03-01-Linux-磁盘/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chw">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CHW's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Linux》磁盘</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-01T17:15:35+08:00">
+                2020-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index">
+                    <span itemprop="name">linux</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/磁盘/" itemprop="url" rel="index">
+                    <span itemprop="name">磁盘</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一、磁盘"><a href="#一、磁盘" class="headerlink" title="一、磁盘"></a>一、磁盘</h1><h2 id="1-1、结构"><a href="#1-1、结构" class="headerlink" title="1.1、结构"></a>1.1、结构</h2><ul>
+<li>盘片</li>
+<li>盘面<ul>
+<li>扇区</li>
+</ul>
+</li>
+<li>柱面</li>
+</ul>
+<a id="more"></a>  
+
+<h3 id="1-1-1、盘片"><a href="#1-1-1、盘片" class="headerlink" title="1.1.1、盘片"></a>1.1.1、盘片</h3><p>一个<code>磁盘</code>（如一个 1T 的机械硬盘）由多个<code>盘片</code>（如下图中的 0 号盘片）叠加而成。</p>
+<p><code>盘片</code>的表面涂有磁性物质，这些磁性物质用来记录二进制数据。因为正反两面都可涂上磁性物质，故一个盘片可能会有两个<code>盘面</code>。
+<img src="/2020/03/01/2020-03-01-Linux-磁盘/%E7%9B%98%E7%89%87.png" alt="盘片"></p>
+<h3 id="1-1-2、盘面"><a href="#1-1-2、盘面" class="headerlink" title="1.1.2、盘面"></a>1.1.2、盘面</h3><p>每个盘面被划分为一个个磁道，每个磁道又划分为一个个<code>扇区</code>。如下图：<br><img src="/2020/03/01/2020-03-01-Linux-磁盘/%E7%9B%98%E9%9D%A2.png" alt="盘面"><br>其中，最内侧磁道上的扇区面积最小，因此数据密度最大。</p>
+<h3 id="1-1-3、柱面"><a href="#1-1-3、柱面" class="headerlink" title="1.1.3、柱面"></a>1.1.3、柱面</h3><p>每个盘面对应一个磁头。所有的磁头都是连在同一个磁臂上的，因此所有磁头只能“共进退”。</p>
+<p>所有盘面中相对位置相同的磁道组成柱面。如下图，<br><img src="/2020/03/01/2020-03-01-Linux-磁盘/%E6%9F%B1%E9%9D%A2.png" alt="柱面"></p>
+<h2 id="1-2、磁盘的物理地址"><a href="#1-2、磁盘的物理地址" class="headerlink" title="1.2、磁盘的物理地址"></a>1.2、磁盘的物理地址</h2><p>由上，可用（柱面号，盘面号，扇区号）来定位任意一个“磁盘块”。</p>
+<p>在“文件的物理结构”小节中，我们经常提到文件数据存放在外存中的几号块（逻辑地址），这个块号就可以转换成（柱面号，盘面号，扇区号）的地址形式。</p>
+<p>可根据该地址读取一个“块”，操作如下：<br>① 根据“柱面号”移动磁臂，让磁头指向指定柱面；<br>② 激活指定盘面对应的磁头；<br>③ 磁盘旋转的过程中，指定的扇区会从磁头下面划过，这样就完成了对指定扇区的读/写。</p>
+<h1 id="二、局部性原理"><a href="#二、局部性原理" class="headerlink" title="二、局部性原理"></a>二、局部性原理</h1><p>局部性原理是计算机科学中的一个重要概念，它主要包括时间局部性和空间局部性。</p>
+<ul>
+<li><strong>时间局部性</strong>是指如果一个存储位置被访问，那么在不久的将来，很可能会再次访问这个位置。例如，在循环中使用的变量，由于循环体可能会多次执行，这个变量会在一段时间内被频繁访问。</li>
+<li><strong>空间局部性</strong>是指一旦一个存储位置被访问，那么它附近的存储位置也很可能会被访问。比如，在访问数组中的一个元素时，很可能会接着访问该元素相邻的其他元素。</li>
+</ul>
+<h1 id="三、局部性原理在计算机系统中的应用"><a href="#三、局部性原理在计算机系统中的应用" class="headerlink" title="三、局部性原理在计算机系统中的应用"></a>三、局部性原理在计算机系统中的应用</h1><h2 id="3-1、缓存（Cache）技术"><a href="#3-1、缓存（Cache）技术" class="headerlink" title="3.1、缓存（Cache）技术"></a>3.1、缓存（Cache）技术</h2><p>现代计算机处理器都有缓存，缓存利用了局部性原理来提高数据访问速度。当处理器需要访问内存中的数据时，它首先会在缓存中查找。由于时间和空间局部性，很可能所需的数据已经在缓存中（缓存命中）。例如，一级缓存（L1 Cache）通常存储处理器最常访问的数据和指令，它的速度非常快，几乎和处理器的速度相同。如果数据在 L1 Cache 中，处理器可以快速地获取数据，而不需要等待从较慢的主内存中读取。</p>
+<h2 id="3-2、预取（Prefetching）技术"><a href="#3-2、预取（Prefetching）技术" class="headerlink" title="3.2、预取（Prefetching）技术"></a>3.2、预取（Prefetching）技术</h2><p>预取技术也是基于局部性原理。处理器或者存储系统可以预测接下来可能会访问的数据，并提前将它们从内存中读取到缓存或者其他高速存储区域。例如，在访问数组元素时，如果检测到空间局部性，系统可以预取数组中后续的几个元素，这样当程序真正需要访问这些元素时，就可以快速获取，减少了等待时间。</p>
+<h2 id="3-3、指令流水线（Instruction-Pipeline）"><a href="#3-3、指令流水线（Instruction-Pipeline）" class="headerlink" title="3.3、指令流水线（Instruction Pipeline）"></a>3.3、指令流水线（Instruction Pipeline）</h2><p>在处理器的指令流水线设计中，局部性原理也起到了作用。因为程序具有时间局部性，很多指令会被重复执行或者顺序执行，指令流水线可以通过提前获取和处理这些指令来提高处理器的性能。例如，在一个循环中，指令流水线可以提前获取下一次循环所需的指令，利用时间局部性来提高执行效率。</p>
+<p>参考文章：<br><a href="https://blog.csdn.net/weixin_37641832/article/details/103217311" target="_blank" rel="noopener">图解 磁盘的结构</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/01/2020-01-01-tomcat-netty对比/" rel="next" title="tomcat-netty对比">
+                <i class="fa fa-chevron-left"></i> tomcat-netty对比
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/02/2020-03-02-Linux-内存/" rel="prev" title="《Linux》内存">
+                《Linux》内存 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/touxiang.jpg" alt="chw">
+            
+              <p class="site-author-name" itemprop="name">chw</p>
+              <p class="site-description motion-element" itemprop="description">do somthing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">64</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">32</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、磁盘"><span class="nav-text">一、磁盘</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1、结构"><span class="nav-text">1.1、结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1、盘片"><span class="nav-text">1.1.1、盘片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2、盘面"><span class="nav-text">1.1.2、盘面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3、柱面"><span class="nav-text">1.1.3、柱面</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2、磁盘的物理地址"><span class="nav-text">1.2、磁盘的物理地址</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、局部性原理"><span class="nav-text">二、局部性原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、局部性原理在计算机系统中的应用"><span class="nav-text">三、局部性原理在计算机系统中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1、缓存（Cache）技术"><span class="nav-text">3.1、缓存（Cache）技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2、预取（Prefetching）技术"><span class="nav-text">3.2、预取（Prefetching）技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3、指令流水线（Instruction-Pipeline）"><span class="nav-text">3.3、指令流水线（Instruction Pipeline）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chw</span>
+
+
+       <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
