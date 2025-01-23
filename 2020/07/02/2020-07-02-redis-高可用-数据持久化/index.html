@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这是“Redis”系列的第二篇文章，主要介绍的是Redis的高可用建设之数据持久化。一、RedisRedis（Remote Dictionary Server）是一个开源的内存数据库，遵守 BSD 协议，它提供了一个高性能的键值（key-value）存储系统，常用于缓存、消息队列、会话存储等应用场景。">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Redis》高可用之“数据持久化”">
+<meta property="og:url" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/index.html">
+<meta property="og:site_name" content="CHW&#39;s Notes">
+<meta property="og:description" content="这是“Redis”系列的第二篇文章，主要介绍的是Redis的高可用建设之数据持久化。一、RedisRedis（Remote Dictionary Server）是一个开源的内存数据库，遵守 BSD 协议，它提供了一个高性能的键值（key-value）存储系统，常用于缓存、消息队列、会话存储等应用场景。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/bgsave%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/AOF.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/AOF%E5%86%99%E5%9B%9E%E7%AD%96%E7%95%A5.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/AOF%E9%87%8D%E5%86%99%E5%9B%BE%E4%BE%8B.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/AOF%E9%87%8D%E5%86%99.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/%E9%87%8D%E5%86%99_%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/%E6%8C%81%E4%B9%85%E5%8C%96%E6%81%A2%E5%A4%8D%E6%95%B0%E6%8D%AE.png">
+<meta property="og:updated_time" content="2025-01-21T09:26:35.585Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Redis》高可用之“数据持久化”">
+<meta name="twitter:description" content="这是“Redis”系列的第二篇文章，主要介绍的是Redis的高可用建设之数据持久化。一、RedisRedis（Remote Dictionary Server）是一个开源的内存数据库，遵守 BSD 协议，它提供了一个高性能的键值（key-value）存储系统，常用于缓存、消息队列、会话存储等应用场景。">
+<meta name="twitter:image" content="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/bgsave%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/">
+
+
+
+
+
+  <title>《Redis》高可用之“数据持久化” | CHW's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CHW's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-fa fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/02/2020-07-02-redis-高可用-数据持久化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chw">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CHW's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《Redis》高可用之“数据持久化”</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-02T12:19:31+08:00">
+                2020-07-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/redis/持久化/" itemprop="url" rel="index">
+                    <span itemprop="name">持久化</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.4k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  12
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>这是“Redis”系列的第二篇文章，主要介绍的是Redis的高可用建设之数据持久化。</code></pre><h1 id="一、Redis"><a href="#一、Redis" class="headerlink" title="一、Redis"></a>一、Redis</h1><p><code>Redis（Remote Dictionary Server）</code>是一个开源的内存数据库，遵守 BSD 协议，它提供了一个高性能的键值（key-value）存储系统，常用于缓存、消息队列、会话存储等应用场景。</p>
+<a id="more"></a>
+
+<h1 id="二、高可用之《数据持久化》"><a href="#二、高可用之《数据持久化》" class="headerlink" title="二、高可用之《数据持久化》"></a>二、高可用之《数据持久化》</h1><p>Redis 持久化是指将 Redis 内存中的数据保存到硬盘等持久化存储介质中，以便在 Redis 服务器重启或故障恢复后能够快速恢复数据，保证数据的可靠性和一致性。Redis 主要有两种持久化方式：RDB（Redis Database）和 AOF（Append Only File），此外还有混合持久化方式。以下是具体介绍：</p>
+<h2 id="2-1、RDB"><a href="#2-1、RDB" class="headerlink" title="2.1、RDB"></a>2.1、RDB</h2><blockquote>
+<p>RDB 就是 Redis DataBase 的缩写，中文名为快照/内存快照，RDB持久化是把当前进程数据生成快照保存到磁盘上的过程，由于是某一时刻的快照，那么快照中的值要早于或者等于内存中的值。</p>
+</blockquote>
+<h3 id="2-1-1、触发方式"><a href="#2-1-1、触发方式" class="headerlink" title="2.1.1、触发方式"></a>2.1.1、触发方式</h3><p>触发rdb持久化的方式有2种，分别是<strong>手动触发</strong>和<strong>自动触发</strong>。</p>
+<h4 id="2-1-1-1、手动触发"><a href="#2-1-1-1、手动触发" class="headerlink" title="2.1.1.1、手动触发"></a>2.1.1.1、手动触发</h4><blockquote>
+<p>手动触发分别对应<code>save</code>和<code>bgsave</code>命令</p>
+</blockquote>
+<h5 id="1、save命令"><a href="#1、save命令" class="headerlink" title="1、save命令"></a>1、save命令</h5><p><strong>save命令：</strong> 阻塞当前Redis服务器，直到RDB过程完成为止，对于内存 比较大的实例会造成长时间阻塞，线上环境不建议使用</p>
+<h5 id="2、bgsave命令"><a href="#2、bgsave命令" class="headerlink" title="2、bgsave命令"></a>2、bgsave命令</h5><p><strong>bgsave命令：</strong> Redis进程执行fork操作创建子进程，RDB持久化过程由子 进程负责，完成后自动结束。阻塞只发生在fork阶段，一般时间很短</p>
+<p>bgsave流程图如下所示：<br><img src="/2020/07/02/2020-07-02-redis-高可用-数据持久化/bgsave%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.png" alt="bgsave执行流程"><br>具体流程如下：</p>
+<ul>
+<li>redis客户端执行bgsave命令或者自动触发bgsave命令；</li>
+<li>主进程判断当前是否已经存在正在执行的子进程，如果存在，那么主进程直接返回；</li>
+<li>如果不存在正在执行的子进程，那么就fork一个新的子进程进行持久化数据，fork过程是阻塞的，fork操作完成后主进程即可执行其他操作；</li>
+<li>子进程先将数据写入到临时的rdb文件中，待快照数据写入完成后再原子替换旧的rdb文件；</li>
+<li>同时发送信号给主进程，通知主进程rdb持久化完成，主进程更新相关的统计信息（info Persitence下的rdb_*相关选项）。</li>
+</ul>
+<h4 id="2-1-1-2、自动触发"><a href="#2-1-1-2、自动触发" class="headerlink" title="2.1.1.2、自动触发"></a>2.1.1.2、自动触发</h4><p>在以下4种情况时会自动触发</p>
+<ul>
+<li>redis.conf中配置配置周期函数serviceCron，<code>save m n</code>，即在m秒内有n次修改时，自动触发bgsave生成rdb文件；<ul>
+<li>save 900 1：900s内有1个key变化，触发RDB</li>
+<li>save 300 10：300s内有10个key变化，触发RDB</li>
+<li>save 60 1000：60s内有1000个key变化，触发RDB</li>
+</ul>
+</li>
+<li>主从复制时，从节点要从主节点进行全量复制时也会触发bgsave操作，生成当时的快照发送到从节点；</li>
+<li>执行debug reload命令重新加载redis时也会触发bgsave操作；</li>
+<li>默认情况下执行shutdown命令时，如果没有开启aof持久化，那么也会触发bgsave操作；</li>
+</ul>
+<h3 id="2-2、RDB的优缺点"><a href="#2-2、RDB的优缺点" class="headerlink" title="2.2、RDB的优缺点"></a>2.2、RDB的优缺点</h3><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>RDB文件是某个时间节点的快照，默认使用LZF算法进行压缩，压缩后的文件体积远远小于内存大小，适用于备份、全量复制等场景；</li>
+<li>Redis加载RDB文件恢复数据要远远快于AOF方式；</li>
+</ul>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>RDB方式实时性不够，无法做到秒级的持久化；</li>
+<li>每次调用bgsave都需要fork子进程，fork子进程属于重量级操作，频繁执行成本较高；</li>
+<li>RDB文件是二进制的，没有可读性，AOF文件在了解其结构的情况下可以手动修改或者补全；</li>
+<li>版本兼容RDB文件问题；</li>
+</ul>
+<p>针对RDB不适合实时持久化的问题，Redis提供了AOF持久化方式来解决#</p>
+<h2 id="2-2、AOF（Append-only-file，追加文件）"><a href="#2-2、AOF（Append-only-file，追加文件）" class="headerlink" title="2.2、AOF（Append only file，追加文件）"></a>2.2、AOF（Append only file，追加文件）</h2><blockquote>
+<p>Redis是“写后”日志，Redis先执行命令，把数据写入内存，然后才记录日志。日志里记录的是Redis收到的每一条命令，这些命令是以文本形式保存。PS: 大多数的数据库采用的是写前日志（WAL），例如MySQL，通过写前日志和两阶段提交，实现数据和逻辑的一致性。</p>
+</blockquote>
+<p>而AOF日志采用写后日志，即先写内存，后写日志。<br><img src="/2020/07/02/2020-07-02-redis-高可用-数据持久化/AOF.png" alt="AOF"></p>
+<h3 id="2-2-1、为什么采用写后日志？"><a href="#2-2-1、为什么采用写后日志？" class="headerlink" title="2.2.1、为什么采用写后日志？"></a>2.2.1、为什么采用写后日志？</h3><p>Redis要求高性能，采用写日志有两方面好处：</p>
+<ul>
+<li>避免额外的检查开销：Redis 在向 AOF 里面记录日志的时候，并不会先去对这些命令进行语法检查。所以，如果先记日志再执行命令的话，日志中就有可能记录了错误的命令，Redis 在使用日志恢复数据时，就可能会出错。</li>
+<li>不会阻塞当前的写操作但</li>
+</ul>
+<p>这种方式存在潜在风险：</p>
+<ul>
+<li>如果命令执行完成，写日志之前宕机了，会丢失数据。</li>
+<li>主线程写磁盘压力大，导致写盘慢，阻塞后续操作。</li>
+</ul>
+<h3 id="2-2-2、AOF实现原理"><a href="#2-2-2、AOF实现原理" class="headerlink" title="2.2.2、AOF实现原理"></a>2.2.2、AOF实现原理</h3><p>AOF日志记录Redis的每个写命令，步骤分为：命令追加（append）、文件写入（write）和文件同步（sync）。</p>
+<ul>
+<li><strong>命令追加</strong> 当AOF持久化功能打开了，服务器在执行完一个写命令之后，会以协议格式将被执行的写命令追加到服务器的 aof_buf 缓冲区。</li>
+<li><strong>文件写入和同步</strong> 关于何时将 aof_buf 缓冲区的内容写入AOF文件中，Redis提供了三种写回策略：<br><img src="/2020/07/02/2020-07-02-redis-高可用-数据持久化/AOF%E5%86%99%E5%9B%9E%E7%AD%96%E7%95%A5.png" alt="AOF写回策略"></li>
+<li><strong>Always</strong>，同步写回：每个写命令执行完，立马同步地将日志写回磁盘；</li>
+<li><strong>Everysec</strong>，每秒写回：每个写命令执行完，只是先把日志写到AOF文件的内存缓冲区，每隔一秒把缓冲区中的内容写入磁盘；</li>
+<li><strong>No</strong>，操作系统控制的写回：每个写命令执行完，只是先把日志写到AOF文件的内存缓冲区，由操作系统决定何时将缓冲区内容写回磁盘。</li>
+</ul>
+<p>关于AOF的同步策略是涉及到操作系统的 write 函数和 fsync 函数的，在《Redis设计与实现》中是这样说明的：</p>
+<blockquote>
+<p>为了提高文件写入效率，在现代操作系统中，当用户调用write函数，将一些数据写入文件时，操作系统通常会将数据暂存到一个内存缓冲区里，当缓冲区的空间被填满或超过了指定时限后，才真正将缓冲区的数据写入到磁盘里。</p>
+<p>这样的操作虽然提高了效率，但也为数据写入带来了安全问题：如果计算机停机，内存缓冲区中的数据会丢失。为此，系统提供了fsync、fdatasync同步函数，可以强制操作系统立刻将缓冲区中的数据写入到硬盘里，从而确保写入数据的安全性。</p>
+</blockquote>
+<p>以下是Redis中关于AOF的主要配置信息：</p>
+<ul>
+<li><strong>appendonly：</strong> 默认情况下AOF功能是关闭的，将该选项改为yes以便打开Redis的AOF功能。</li>
+<li><strong>appendfilename：</strong> 这个参数项很好理解了，就是AOF文件的名字。</li>
+<li><strong>appendfsync：</strong> 这个参数项是AOF功能最重要的设置项之一，主要用于设置“真正执行”操作命令向AOF文件中同步的策略。</li>
+</ul>
+<p>什么叫“真正执行”呢？还记得Linux操作系统对磁盘设备的操作方式吗？ 为了保证操作系统中I/O队列的操作效率，应用程序提交的I/O操作请求一般是被放置在linux Page Cache中的，然后再由Linux操作系统中的策略自行决定正在写到磁盘上的时机。而Redis中有一个fsync()函数，可以将Page Cache中待写的数据真正写入到物理设备上，而缺点是频繁调用这个fsync()函数干预操作系统的既定策略，可能导致I/O卡顿的现象频繁 。</p>
+<h3 id="2-2-3、AOF重写"><a href="#2-2-3、AOF重写" class="headerlink" title="2.2.3、AOF重写"></a>2.2.3、AOF重写</h3><p>AOF会记录每个写命令到AOF文件，随着时间越来越长，AOF文件会变得越来越大。如果不加以控制，会对Redis服务器，甚至对操作系统造成影响，而且AOF文件越大，数据恢复也越慢。为了解决AOF文件体积膨胀的问题，Redis提供AOF文件重写机制来对AOF文件进行“瘦身”。</p>
+<h4 id="2-2-3-1、图例解释AOF重写"><a href="#2-2-3-1、图例解释AOF重写" class="headerlink" title="2.2.3.1、图例解释AOF重写"></a>2.2.3.1、图例解释AOF重写</h4><p>Redis通过创建一个新的AOF文件来替换现有的AOF，新旧两个AOF文件保存的数据相同，但新AOF文件没有了冗余命令。<br><img src="/2020/07/02/2020-07-02-redis-高可用-数据持久化/AOF%E9%87%8D%E5%86%99%E5%9B%BE%E4%BE%8B.png" alt="AOF重写图例"></p>
+<h4 id="2-2-3-2、AOF重写会阻塞吗？"><a href="#2-2-3-2、AOF重写会阻塞吗？" class="headerlink" title="2.2.3.2、AOF重写会阻塞吗？"></a>2.2.3.2、AOF重写会阻塞吗？</h4><p>AOF重写过程是由后台进程<code>bgrewriteaof</code>来完成的。主线程fork出后台的<code>bgrewriteaof</code>子进程，fork会把主线程的内存拷贝一份给<code>bgrewriteaof</code>子进程，这里面就包含了数据库的最新数据。然后，<code>bgrewriteaof</code>子进程就可以在不影响主线程的情况下，逐一把拷贝的数据写成操作，记入重写日志。</p>
+<p>所以aof在重写时，在fork进程时是会阻塞住主线程的。</p>
+<h4 id="2-2-3-3、AOF日志何时会重写？"><a href="#2-2-3-3、AOF日志何时会重写？" class="headerlink" title="2.2.3.3、AOF日志何时会重写？"></a>2.2.3.3、AOF日志何时会重写？</h4><p>有两个配置项控制AOF重写的触发：</p>
+<ul>
+<li>auto-aof-rewrite-min-size:表示运行AOF重写时文件的最小大小，默认为64MB。</li>
+<li>auto-aof-rewrite-percentage:这个值的计算方式是，当前aof文件大小和上一次重写后aof文件大小的差值，再除以上一次重写后aof文件大小。也就是当前aof文件比上一次重写后aof文件的增量大小，和上一次重写后aof文件大小的比值。</li>
+</ul>
+<h4 id="2-2-3-4、重写日志时，有新数据写入咋整？"><a href="#2-2-3-4、重写日志时，有新数据写入咋整？" class="headerlink" title="2.2.3.4、重写日志时，有新数据写入咋整？"></a>2.2.3.4、重写日志时，有新数据写入咋整？</h4><p>重写过程总结为：“一个拷贝，两处日志”。在fork出子进程时的拷贝，以及在重写时，如果有新数据写入，主线程就会将命令记录到<strong>两个aof日志内存缓冲区</strong>中。如果AOF写回策略配置的是always，则直接将命令写回旧的日志文件，并且保存一份命令至AOF重写缓冲区，这些操作对新的日志文件是不存在影响的。（旧的日志文件：主线程使用的日志文件，新的日志文件：bgrewriteaof进程使用的日志文件）</p>
+<p>而在bgrewriteaof子进程完成会日志文件的重写操作后，会提示主线程已经完成重写操作，主线程会将AOF重写缓冲中的命令追加到新的日志文件后面。这时候在高并发的情况下，AOF重写缓冲区积累可能会很大，这样就会造成阻塞，Redis后来通过Linux管道技术让aof重写期间就能同时进行回放，这样aof重写结束后只需回放少量剩余的数据即可。</p>
+<p>最后通过修改文件名的方式，保证文件切换的原子性。</p>
+<p>在AOF重写日志期间发生宕机的话，因为日志文件还没切换，所以恢复数据时，用的还是旧的日志文件。</p>
+<p>总结操作：</p>
+<ul>
+<li>主线程fork出子进程重写aof日志</li>
+<li>子进程重写日志完成后，主线程追加aof日志缓冲</li>
+<li>替换日志文件</li>
+</ul>
+<p><img src="/2020/07/02/2020-07-02-redis-高可用-数据持久化/AOF%E9%87%8D%E5%86%99.png" alt="AOF重写"></p>
+<h4 id="2-2-3-5、主线程fork出子进程的是如何复制内存数据的？"><a href="#2-2-3-5、主线程fork出子进程的是如何复制内存数据的？" class="headerlink" title="2.2.3.5、主线程fork出子进程的是如何复制内存数据的？"></a>2.2.3.5、主线程fork出子进程的是如何复制内存数据的？</h4><p>fork采用操作系统提供的写时复制（copy on write）机制，就是为了避免一次性拷贝大量内存数据给子进程造成阻塞。fork子进程时，子进程时会拷贝父进程的页表，即虚实映射关系（虚拟内存和物理内存的映射索引表），而不会拷贝物理内存。这个拷贝会消耗大量cpu资源，并且拷贝完成前会阻塞主线程，阻塞时间取决于内存中的数据量，数据量越大，则内存页表越大。拷贝完成后，父子进程使用相同的内存地址空间。</p>
+<p>但主进程是可以有数据写入的，这时候就会拷贝物理内存中的数据。如下图（进程1看做是主进程，进程2看做是子进程）：<br><img src="/2020/07/02/2020-07-02-redis-高可用-数据持久化/%E9%87%8D%E5%86%99_%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6.png" alt="重写_写时复制"><br>在主进程有数据写入时，而这个数据刚好在页c中，操作系统会创建这个页面的副本（页c的副本），即拷贝当前页的物理数据，将其映射到主进程中，而子进程还是使用原来的的页c。</p>
+<h2 id="2-3、RDB和AOF混合方式（4-0版本"><a href="#2-3、RDB和AOF混合方式（4-0版本" class="headerlink" title="2.3、RDB和AOF混合方式（4.0版本)"></a>2.3、RDB和AOF混合方式（4.0版本)</h2><p>Redis 4.0 中提出了一个混合使用 AOF 日志和内存快照的方法。简单来说，内存快照以一定的频率执行，在两次快照之间，使用 AOF 日志记录这期间的所有命令操作。</p>
+<h2 id="2-4、RDB和AOF的区别"><a href="#2-4、RDB和AOF的区别" class="headerlink" title="2.4、RDB和AOF的区别"></a>2.4、RDB和AOF的区别</h2><ul>
+<li>RDB持久化，会将内存中的所有数据进行写文件，耗时长，适合冷备数据。</li>
+<li>AOF持久化，每次写入数据少，耗时短，适合实时持久化</li>
+<li>Redis的阻塞场景在fork子进程阶段和AOF重写拼接阶段。</li>
+</ul>
+<h2 id="2-5、从持久化中恢复数据"><a href="#2-5、从持久化中恢复数据" class="headerlink" title="2.5、从持久化中恢复数据"></a>2.5、从持久化中恢复数据</h2><p>数据的备份、持久化做完了，我们如何从这些持久化文件中恢复数据呢？如果一台服务器上有既有RDB文件，又有AOF文件，该加载谁呢？<br><img src="/2020/07/02/2020-07-02-redis-高可用-数据持久化/%E6%8C%81%E4%B9%85%E5%8C%96%E6%81%A2%E5%A4%8D%E6%95%B0%E6%8D%AE.png" alt="持久化恢复数据"></p>
+<p>参考文章：<br><a href="https://pdai.tech/md/db/nosql-redis/db-redis-x-rdb-aof.html" target="_blank" rel="noopener">持久化</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/01/2020-07-01-redis-架构/" rel="next" title="《Redis》架构">
+                <i class="fa fa-chevron-left"></i> 《Redis》架构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/07/04/2020-07-04-redis-高可用-主从同步/" rel="prev" title="《Redis》高可用之“主从同步”">
+                《Redis》高可用之“主从同步” <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/touxiang.jpg" alt="chw">
+            
+              <p class="site-author-name" itemprop="name">chw</p>
+              <p class="site-description motion-element" itemprop="description">do somthing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、Redis"><span class="nav-text">一、Redis</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、高可用之《数据持久化》"><span class="nav-text">二、高可用之《数据持久化》</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1、RDB"><span class="nav-text">2.1、RDB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1、触发方式"><span class="nav-text">2.1.1、触发方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-1、手动触发"><span class="nav-text">2.1.1.1、手动触发</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1、save命令"><span class="nav-text">1、save命令</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2、bgsave命令"><span class="nav-text">2、bgsave命令</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-2、自动触发"><span class="nav-text">2.1.1.2、自动触发</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2、RDB的优缺点"><span class="nav-text">2.2、RDB的优缺点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点"><span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点"><span class="nav-text">缺点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2、AOF（Append-only-file，追加文件）"><span class="nav-text">2.2、AOF（Append only file，追加文件）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1、为什么采用写后日志？"><span class="nav-text">2.2.1、为什么采用写后日志？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2、AOF实现原理"><span class="nav-text">2.2.2、AOF实现原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-3、AOF重写"><span class="nav-text">2.2.3、AOF重写</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-1、图例解释AOF重写"><span class="nav-text">2.2.3.1、图例解释AOF重写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-2、AOF重写会阻塞吗？"><span class="nav-text">2.2.3.2、AOF重写会阻塞吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-3、AOF日志何时会重写？"><span class="nav-text">2.2.3.3、AOF日志何时会重写？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-4、重写日志时，有新数据写入咋整？"><span class="nav-text">2.2.3.4、重写日志时，有新数据写入咋整？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-5、主线程fork出子进程的是如何复制内存数据的？"><span class="nav-text">2.2.3.5、主线程fork出子进程的是如何复制内存数据的？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3、RDB和AOF混合方式（4-0版本"><span class="nav-text">2.3、RDB和AOF混合方式（4.0版本)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4、RDB和AOF的区别"><span class="nav-text">2.4、RDB和AOF的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5、从持久化中恢复数据"><span class="nav-text">2.5、从持久化中恢复数据</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chw</span>
+
+
+       <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
