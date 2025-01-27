@@ -89,6 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/%E6%BA%90%E7%A0%81%E7%BB%93%E6%9E%84.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/redisServer.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/dictEntry.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/redis%E6%A0%B8%E5%BF%83%E7%BB%93%E6%9E%84.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/5%E7%A7%8D%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B.png">
@@ -108,7 +109,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/stream_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/stream.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/07/2020-07-07-redis-常见数据类型/%E6%80%BB%E7%BB%93.png">
-<meta property="og:updated_time" content="2025-01-23T03:23:53.719Z">
+<meta property="og:updated_time" content="2025-01-24T10:24:21.697Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Redis》常见数据类型及应用场景">
 <meta name="twitter:description" content="这是“Redis”系列的第五篇文章，主要介绍的是Redis的“常见数据类型及应用场景”。一、RedisRedis（Remote Dictionary Server）是一个开源的内存数据库，遵守 BSD 协议，它提供了一个高性能的键值（key-value）存储系统，常用于缓存、消息队列、会话存储等应用场景。">
@@ -435,9 +436,11 @@
 </li>
 <li>clients; // 连接的客户端</li>
 </ul>
+<p>源码总览：<br><img src="/2020/07/07/2020-07-07-redis-常见数据类型/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png" alt="数据结构"></p>
 <h2 id="2-2、redisDb"><a href="#2-2、redisDb" class="headerlink" title="2.2、redisDb"></a>2.2、redisDb</h2><p><code>redisDb</code>是<code>redis</code>的键值对存储的位置，<strong>主要包含两大块，一块存储数据，另一块存储过期信信息</strong>，<code>dict</code>结构实际上是两个哈希表，至于为什么有两个，这里是为了做渐进式<code>rehash</code>使用（后面会详细介绍），<code>rehashidx</code>用于表示<code>rehash</code>进度，iterators迭代器是表示遍历集合操作个数，表里面的元素就是entry，这里面包含key和value以及指向下一个元素的指针。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Redis database representation. There are multiple databases identified</span></span><br><span class="line"><span class="comment"> * by integers from 0 (the default database) up to the max configured</span></span><br><span class="line"><span class="comment"> * database. The database number is the 'id' field in the structure. */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">redisDb</span> &#123;</span></span><br><span class="line">    <span class="comment">// 数据库键空间，保存着数据库中的所有键值对</span></span><br><span class="line">    dict *dict;                 <span class="comment">/* The keyspace for this DB */</span></span><br><span class="line">    <span class="comment">// 键的过期时间，字典的键为键，字典的值为过期事件 UNIX 时间戳</span></span><br><span class="line">    dict *expires;              <span class="comment">/* Timeout of keys with a timeout set */</span></span><br><span class="line">    <span class="comment">// 正处于阻塞状态的键</span></span><br><span class="line">    dict *blocking_keys;        <span class="comment">/* Keys with clients waiting for data (BLPOP) */</span></span><br><span class="line">    <span class="comment">// 可以解除阻塞的键</span></span><br><span class="line">    dict *ready_keys;           <span class="comment">/* Blocked keys that received a PUSH */</span></span><br><span class="line">    <span class="comment">// 正在被 WATCH 命令监视的键</span></span><br><span class="line">    dict *watched_keys;         <span class="comment">/* WATCHED keys for MULTI/EXEC CAS */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">evictionPoolEntry</span> *<span class="title">eviction_pool</span>;</span>    <span class="comment">/* Eviction pool of keys */</span></span><br><span class="line">    <span class="comment">// 数据库号码</span></span><br><span class="line">    <span class="keyword">int</span> id;                     <span class="comment">/* Database ID */</span></span><br><span class="line">    <span class="comment">// 数据库的键的平均 TTL ，统计信息</span></span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> avg_ttl;          <span class="comment">/* Average TTL, just for stats */</span></span><br><span class="line">&#125; redisDb;</span><br></pre></td></tr></table></figure>
 
+<p><font color="red"><strong>dict *expires：「过期字典」</strong></font>保存了数据库中所有 key 的过期时间，更多内容查看后续文章“数据淘汰策略”。</p>
 <h2 id="2-3、dict【字典】"><a href="#2-3、dict【字典】" class="headerlink" title="2.3、dict【字典】"></a>2.3、dict【字典】</h2><p>redis是一个键值对数据库，<code>dict</code>字典保存所有的键值对，称<code>dict</code>字典为“键空间”，存储数据库中的所有key-value</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">    dictType *type; <span class="comment">// 类型，主要定义相关的函数</span></span><br><span class="line">    <span class="keyword">void</span> *privdata;</span><br><span class="line">    dictht ht[<span class="number">2</span>];  <span class="comment">// 两个hash table，用于做渐进式rehash使用</span></span><br><span class="line">    <span class="keyword">int</span> rehashidx; <span class="comment">/* rehash进度 rehashidx == -1表示不是正在rehash*/</span></span><br><span class="line">    <span class="keyword">int</span> iterators; <span class="comment">/* number of iterators currently running */</span></span><br><span class="line">&#125; dict;</span><br></pre></td></tr></table></figure>
 
@@ -581,7 +584,7 @@
 <p>为了留存消息，List 类型提供了 BRPOPLPUSH 命令，这个命令的作用<strong>是让消费者程序从一个 List 中读取消息，同时，Redis 会把这个消息再插入到另一个 List（可以叫作备份 List）留存。</strong></p>
 <h5 id="2、微博、朋友圈、公众号等，关注的文章列表展示"><a href="#2、微博、朋友圈、公众号等，关注的文章列表展示" class="headerlink" title="2、微博、朋友圈、公众号等，关注的文章列表展示"></a>2、微博、朋友圈、公众号等，关注的文章列表展示</h5><p>假如 <code>小明</code> 关注了 <code>中国青年报、三太子敖丙</code> 等大V的订阅号，当这些大V发布订阅号时，通过推或拉的方式把消息<code>LPUSH</code>放入redis中属于小明的list中。其中key为<code>msg:{小明_ID}</code>。当小明要获取大V们发的消息时，使用<code>LRANGE</code> 命令从队列中获取指定个数的订阅号信息！！<br><img src="/2020/07/07/2020-07-07-redis-常见数据类型/list_%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF_%E6%96%87%E7%AB%A0%E5%88%97%E8%A1%A8.png" alt="list_应用场景_文章列表"></p>
 <h3 id="3-1-3、hash"><a href="#3-1-3、hash" class="headerlink" title="3.1.3、hash"></a>3.1.3、hash</h3><p>Hash 是一个键值对（key - value）集合，其中 value 的形式如： <code>value=[{field1，value1}，...{fieldN，valueN}]</code>。Hash 特别适合用于存储对象。</p>
-<h4 id="3-1-3-1、实现方式"><a href="#3-1-3-1、实现方式" class="headerlink" title="3.1.3.1、实现方式"></a>3.1.3.1、实现方式</h4><p>Hash 类型的底层数据结构是由压缩列表或哈希表实现的：</p>
+<h4 id="3-1-3-1、实现方式"><a href="#3-1-3-1、实现方式" class="headerlink" title="3.1.3.1、实现方式"></a>3.1.3.1、实现方式</h4><p>Hash 类型的底层数据结构是由<strong>压缩列表</strong>或<strong>哈希表</strong>实现的：</p>
 <ul>
 <li>如果哈希类型元素个数小于 512 个（默认值，可由 <code>hash-max-ziplist-entries</code> 配置），所有值小于 64 字节（默认值，可由 hash-max-ziplist-value 配置）的话，Redis 会使用压缩列表作为 Hash 类型的底层数据结构；</li>
 <li>如果哈希类型元素不满足上面条件，Redis 会使用哈希表作为 Hash 类型的 底层数据结构。</li>
@@ -899,8 +902,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/10/19/2020-10-19-交易账单/" rel="prev" title="交易账单">
-                交易账单 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/07/10/2020-07-10-redis-数据结构/" rel="prev" title="《Redis》数据结构">
+                《Redis》数据结构 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -980,7 +983,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -991,7 +994,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">72</span>
+                  <span class="site-state-item-count">73</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
