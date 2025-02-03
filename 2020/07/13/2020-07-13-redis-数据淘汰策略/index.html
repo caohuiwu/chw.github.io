@@ -90,7 +90,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/07/13/2020-07-13-redis-数据淘汰策略/%E6%95%B0%E6%8D%AE%E6%B7%98%E6%B1%B0%E6%8F%90%E7%BA%B2.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/13/2020-07-13-redis-数据淘汰策略/%E8%BF%87%E6%9C%9F%E5%AD%97%E5%85%B8.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/13/2020-07-13-redis-数据淘汰策略/%E8%BF%87%E6%9C%9F%E9%94%AE%E5%88%A4%E6%96%AD%E6%B5%81%E7%A8%8B.png">
-<meta property="og:updated_time" content="2025-01-24T15:11:41.729Z">
+<meta property="og:updated_time" content="2025-02-03T01:37:57.458Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《Redis》数据淘汰策略">
 <meta name="twitter:description" content="这是“Redis”系列的第七篇文章，主要介绍的是Redis的“数据淘汰”。一、RedisRedis（Remote Dictionary Server）是一个开源的内存数据库，遵守 BSD 协议，它提供了一个高性能的键值（key-value）存储系统，常用于缓存、消息队列、会话存储等应用场景。">
@@ -506,7 +506,7 @@
 <h3 id="4-2-2、缺陷"><a href="#4-2-2、缺陷" class="headerlink" title="4.2.2、缺陷"></a>4.2.2、缺陷</h3><p>可以理解成是旁路缓存模式的封装，也存在热点数据的问题。</p>
 <p><font color="red"><strong>同步更新cache 和DB</strong></font></p>
 <h2 id="4-3、异步缓存写入（write-behind-pattern）"><a href="#4-3、异步缓存写入（write-behind-pattern）" class="headerlink" title="4.3、异步缓存写入（write behind pattern）"></a>4.3、异步缓存写入（write behind pattern）</h2><p>只更新cache，不直接更新DB，而是改为异步批量的方式来更新DB。</p>
-<p>很明显，这种方式对数据一致性带来了更大的挑战，比如 cache 数据可能还没异步更新 db 的话，cache 服务可能就就挂掉了。这种策略在我们平时开发过程中也非常非常少见（也不是如此，在阿里很多场景都是使用这种方式），但是不代表它的应用场景少，比如消息队列中消息的异步写入磁盘、MySQL 的 Innodb Buffer Pool 机制都用到了这种策略。Write Behind Pattern 下 db 的写性能非常高，非常适合一些数据经常变化又对数据一致性要求没那么高的场景，比如浏览量、点赞量。</p>
+<p>很明显，这种方式对数据一致性带来了更大的挑战，比如 cache 数据可能还没异步更新 db 的话，cache 服务可能就就挂掉了。这种策略在我们平时开发过程中也非常非常少见，但是不代表它的应用场景少，比如消息队列中消息的异步写入磁盘、MySQL 的 Innodb Buffer Pool 机制都用到了这种策略。Write Behind Pattern 下 db 的写性能非常高，非常适合一些数据经常变化又对数据一致性要求没那么高的场景，比如浏览量、点赞量。</p>
 <p>参考文章：<br><a href="https://xiaolincoding.com/redis/data_struct/command.html#string" target="_blank" rel="noopener">Redis 常见数据类型和应用场景</a><br><a href="https://xiaolincoding.com/redis/data_struct/data_struct.html" target="_blank" rel="noopener">Redis 数据结构</a><br><a href="https://www.51cto.com/article/766539.html" target="_blank" rel="noopener">Redis Stream 数据结构实现原理真的很强</a><br><a href="https://cloud.tencent.com/developer/article/2427055" target="_blank" rel="noopener">Redis源码解析：一条Redis命令是如何执行的？</a></p>
 
       
@@ -623,7 +623,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">111</span>
+                  <span class="site-state-item-count">114</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -634,7 +634,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-count">82</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
