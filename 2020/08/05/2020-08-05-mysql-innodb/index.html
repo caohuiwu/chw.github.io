@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这是“mysql”系列的第二篇文章，主要介绍的是innodb存储引擎。一、mysqlMySQL 是一种广泛使用的开源关系型数据库管理系统（RDBMS–Relational Database Management System）">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《mysql》innodb">
+<meta property="og:url" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/index.html">
+<meta property="og:site_name" content="CHW&#39;s Notes">
+<meta property="og:description" content="这是“mysql”系列的第二篇文章，主要介绍的是innodb存储引擎。一、mysqlMySQL 是一种广泛使用的开源关系型数据库管理系统（RDBMS–Relational Database Management System）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/innodb_compact_%E8%A1%8C%E6%A0%BC%E5%BC%8F.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/innodb_compact_%E8%AE%B0%E5%BD%95%E5%A4%B4.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/innodb_redundant_%E8%A1%8C%E6%A0%BC%E5%BC%8F.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/innodb_%E6%95%B0%E6%8D%AE%E9%A1%B5%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/File_header.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/page_header.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/innodb_%E8%A1%8C%E8%AE%B0%E5%BD%95_%E8%AE%B0%E5%BD%95%E5%A4%B4.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/innodb_%E8%A1%8C%E8%AE%B0%E5%BD%95_%E9%93%BE%E8%A1%A8.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/page_directory.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/%E6%95%B0%E6%8D%AE%E9%A1%B5%E6%9F%A5%E8%AF%A2.png">
+<meta property="og:updated_time" content="2025-02-12T03:18:22.220Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《mysql》innodb">
+<meta name="twitter:description" content="这是“mysql”系列的第二篇文章，主要介绍的是innodb存储引擎。一、mysqlMySQL 是一种广泛使用的开源关系型数据库管理系统（RDBMS–Relational Database Management System）">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/">
+
+
+
+
+
+  <title>《mysql》innodb | CHW's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CHW's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-fa fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/05/2020-08-05-mysql-innodb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chw">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CHW's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《mysql》innodb</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-05T11:19:31+08:00">
+                2020-08-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/mysql/innodb/" itemprop="url" rel="index">
+                    <span itemprop="name">innodb</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  4.4k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  15
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>这是“mysql”系列的第二篇文章，主要介绍的是innodb存储引擎。</code></pre><h1 id="一、mysql"><a href="#一、mysql" class="headerlink" title="一、mysql"></a>一、mysql</h1><p><code>MySQL</code> 是一种广泛使用的开源关系型数据库管理系统（RDBMS–Relational Database Management System）</p>
+<a id="more"></a>
+<p>基本结构：<br><img src="/2020/08/05/2020-08-05-mysql-innodb/%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png" alt="基本结构"></p>
+<h1 id="二、mysql存储引擎"><a href="#二、mysql存储引擎" class="headerlink" title="二、mysql存储引擎"></a>二、mysql存储引擎</h1><p>MySQL 存储引擎是 MySQL 数据库管理系统中负责数据存储和检索的组件，不同的存储引擎具有不同的特点和适用场景。</p>
+<style>
+table th:first-of-type {
+    width: 12%;
+}
+table th:nth-of-type(3) {
+    width: 40%;
+}
+table tr td:nth-child(1),
+table tr th:nth-child(1) {
+    font-weight: bold;
+}
+</style>
+
+<p><strong>常见的存储引擎如下：</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">存储引擎</th>
+<th align="right">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">InnoDB</td>
+<td align="right">5.5版本后MySQL的默认数据库，支持事务和行级锁定，比MyISAM处理速度稍慢</td>
+</tr>
+<tr>
+<td align="left">MyISAM</td>
+<td align="right">高速引擎，拥有较高的插入，查询速度，但不支持事务</td>
+</tr>
+<tr>
+<td align="left">Memory</td>
+<td align="right">内存存储引擎，拥有极高的插入，更新和查询效率。但是会占用和数据量成正比的内存空间。只在内存上保存数据，意味着数据可能会丢失</td>
+</tr>
+<tr>
+<td align="left">MRG_MyISAM（MERGE）</td>
+<td align="right">将多个表联合成一个表使用，在超大规模数据存储时很有用</td>
+</tr>
+<tr>
+<td align="left">Falcon</td>
+<td align="right">一种新的存储引擎，支持事物处理，传言可能是InnoDB的替代者</td>
+</tr>
+<tr>
+<td align="left">Archive</td>
+<td align="right">将数据压缩后进行存储，非常适合存储大量的独立的，作为历史记录的数据，但是只能进行插入和查询操作</td>
+</tr>
+<tr>
+<td align="left">CSVCSV</td>
+<td align="right">存储引擎是基于 CSV 格式文件存储数据(应用于跨平台的数据交换)</td>
+</tr>
+</tbody></table>
+<p><strong>InnoDB和MyISAM存储引擎区别：</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th>InnoDB</th>
+<th align="right">MyISAM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">存储文件</td>
+<td>.frm 表定义文件.ibd 数据文件和索引文件</td>
+<td align="right">.frm 表定义文件.myd 数据文件.myi 索引文件</td>
+</tr>
+<tr>
+<td align="left">锁</td>
+<td>表锁、行锁</td>
+<td align="right">表锁</td>
+</tr>
+<tr>
+<td align="left">事务</td>
+<td>支持</td>
+<td align="right">不支持</td>
+</tr>
+<tr>
+<td align="left">CRDU</td>
+<td>读、写</td>
+<td align="right">读多</td>
+</tr>
+<tr>
+<td align="left">count</td>
+<td>扫表</td>
+<td align="right">专门存储的地方</td>
+</tr>
+<tr>
+<td align="left">索引结构</td>
+<td>B+ Tree</td>
+<td align="right">B+ Tree</td>
+</tr>
+</tbody></table>
+<h1 id="三、innodb存储引擎"><a href="#三、innodb存储引擎" class="headerlink" title="三、innodb存储引擎"></a>三、innodb存储引擎</h1><p><code>innodb</code>是一个将表中的数据存储到磁盘上的存储引擎，所以即使关机后重启我们的数据还是存在的。</p>
+<p>真正处理数据的过程是发生在内存中的，所以需要把磁盘中的数据加载到内存中，如果是处理写入或修改请求的话，还需要把内存中的内容刷新到磁盘上。而我们知道读写磁盘的速度非常慢，和内存读写差几个数量级，所以当我们想从表中获取某些记录时，<code>innodb</code> 存储引擎需要一条一条的把记录从磁盘上读取出来么？</p>
+<p>不，那样会慢死，<code>innodb</code>采用的方式是：<font color="green"><strong>将数据划分为若干个页，以页作为磁盘和内存之间交互的基本单位，innodb中页的大小一般为 <code>16KB</code></strong></font>。也就是在一般情况下，一次最少从磁盘中读取<code>16KB</code>的内容到内存中，一次最少把内存中的<code>16KB</code>内容刷新到磁盘中。</p>
+<h2 id="3-1、innodb行格式"><a href="#3-1、innodb行格式" class="headerlink" title="3.1、innodb行格式"></a>3.1、innodb行格式</h2><p>我们平常是以记录为单位来向表中插入数据的，这些记录<strong>在磁盘上的存放方式</strong>也被称为 <font color="green"><strong>行格式</strong></font> 或者 <font color="green"><strong>记录格式</strong></font>。</p>
+<p>innodb存储引擎有4种不同类型的行格式：</p>
+<ul>
+<li>compact</li>
+<li>redundant</li>
+<li>dynamic</li>
+<li>compressed</li>
+</ul>
+<h3 id="3-1-1、如何设置行格式？"><a href="#3-1-1、如何设置行格式？" class="headerlink" title="3.1.1、如何设置行格式？"></a>3.1.1、如何设置行格式？</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE 表 (</span><br><span class="line">...</span><br><span class="line">)ROW_FORMST=COMPACT</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-1-2、compact行格式"><a href="#3-1-2、compact行格式" class="headerlink" title="3.1.2、compact行格式"></a>3.1.2、compact行格式</h3><p><img src="/2020/08/05/2020-08-05-mysql-innodb/innodb_compact_%E8%A1%8C%E6%A0%BC%E5%BC%8F.png" alt="innodb_compact_行格式"><br>一条完整的记录，其实可以分为 “记录的额外信息” 和 “记录的真实数据” 两大部分。</p>
+<h4 id="3-1-2-1、额外信息"><a href="#3-1-2-1、额外信息" class="headerlink" title="3.1.2.1、额外信息"></a>3.1.2.1、额外信息</h4><p>额外信息分为3类：</p>
+<ul>
+<li>变长字段长度列表</li>
+<li>NULL值列表</li>
+<li>记录头信息</li>
+</ul>
+<h5 id="1-变长字段长度表"><a href="#1-变长字段长度表" class="headerlink" title="1. 变长字段长度表"></a>1. 变长字段长度表</h5><p>对于像 varchar， varbinary，text，blob，json以及他们的各种类型的可变长度字段【可称为变长字段】，需要将他们到底占用多少字节存储起来，这样就省去了列数据之间的边界定义，MySQL 就可以分清楚哪些数据属于这一列，哪些不属于。</p>
+<p>所以这些变长字段占用的存储空间分为两部分：</p>
+<ol>
+<li>真正的数据内容。</li>
+<li>占用的字节数。</li>
+</ol>
+<p>在compact行格式中，把所有变长字段的真实数据占用的字节长度都存放在记录的开头部位，从而形成一个变长字段长度列表，各变长字段数据占用的字节数按照列的顺序<font color="green"><strong>逆序存放</strong></font>。</p>
+<p>示例：<br>假设</p>
+<h5 id="2-NUll值列表"><a href="#2-NUll值列表" class="headerlink" title="2. NUll值列表"></a>2. NUll值列表</h5><p>NULL值列表（NULL Value list），这个列表是行记录的一部分，用于优化存储空间和提高查询效率。</p>
+<p>作用：</p>
+<ul>
+<li><strong>标识NULL列</strong>：对于允许 NULL的列，如果某一行的该列值为NULL，则不需要实际存储NULL值，而是通过NULL值列表中的位(bit)来标识。</li>
+<li><strong>节省空间</strong>：通过位图的方式存储NULL值信息，避免了为每个NULL值分配额外的存储空间。</li>
+</ul>
+<h5 id="3-记录头信息"><a href="#3-记录头信息" class="headerlink" title="3. 记录头信息"></a>3. 记录头信息</h5><p>记录头固定为5字节大小：<br><img src="/2020/08/05/2020-08-05-mysql-innodb/innodb_compact_%E8%AE%B0%E5%BD%95%E5%A4%B4.png" alt="innodb_compact_记录头"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">无用位 2   目前没用到</span><br><span class="line">deleted_flag   1     记录是否被删除</span><br><span class="line">min_rec_flag  1     B+树中非叶子节点最小记录标记</span><br><span class="line">n_owned         4    该记录对应槽所拥有记录数量</span><br><span class="line">heap_no          13   该记录在堆中的序号，也可以理解为在堆中的位置信息</span><br><span class="line">record_type     3    记录类型，普通数据记录为000，节点指针类型为001，伪记录首记录 infimum 行为010，伪记录最后一个记录 supremum 行为011，1xx的为保留的</span><br><span class="line">next_record pointer    16     页中下一条记录的相对位置</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>delted_flag<br>被删除的记录还在数据页中，不立即删除是因为移除删除数据后需要对其他在磁盘中的数据重新排列回导致性能消耗，所以只是打了一个删除标记。<br>所有被删除的记录都会组成一个 垃圾链表，在链表中的记录占用的空间称为“可重用空间”，之后如果有新记录插入到表中的话，可能会将被占用的存储空间覆盖掉。</li>
+<li>record_type<ul>
+<li>0：普通记录</li>
+<li>2：最小记录</li>
+<li>3：最大记录 </li>
+<li>1：目录项记录（索引）</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-1-2-2、真实数据"><a href="#3-1-2-2、真实数据" class="headerlink" title="3.1.2.2、真实数据"></a>3.1.2.2、真实数据</h4><h5 id="1-隐藏列"><a href="#1-隐藏列" class="headerlink" title="1. 隐藏列"></a>1. 隐藏列</h5><p>mysql会为每个记录默认的添加一些列（也称为 隐藏列），具体的列如下：</p>
+<ul>
+<li>DB_ROW_ID<ul>
+<li>6字节</li>
+<li>主键ID，这个列不一定会生成。优先使用用户自定义主键作为主键，如果用户没有定义主键，则选取一个 Unique 键作为主键，如果表中连 Unique 键都没有定义的话，则会为表默认添加一个名为 DB_ROW_ID 的隐藏列作为主键</li>
+</ul>
+</li>
+<li>DB_TRX_ID<ul>
+<li>6字节</li>
+<li>产生当前记录项的事务id，每开始一个新的事务时，系统版本号会自动递增，而事务开始时刻的系统版本号会作为事务id，事务 commit 的话，就会更新这里的 DB_TRX_ID</li>
+</ul>
+</li>
+<li>DB_ROLL_PTR<ul>
+<li>7字节</li>
+<li>undo log 指针，指向当前记录项的 undo log，找之前版本的数据需通过此指针。如果事务回滚的话，则从 undo Log 中把原始值读取出来再放到记录中去</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-1-2-3、示例："><a href="#3-1-2-3、示例：" class="headerlink" title="3.1.2.3、示例："></a>3.1.2.3、示例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+-------+------------+------+----------+------------------+</span><br><span class="line">| id    | score      | name | content  | extra            |</span><br><span class="line">+-------+------------+------+----------+------------------+</span><br><span class="line">|     1 |       78.5 | hash | wodetian | nidetiantadetian |</span><br><span class="line">+-------+------------+------+----------+------------------+</span><br></pre></td></tr></table></figure>
+
+<p>有两个数据不为NULL的字段</p>
+<ul>
+<li>content：长度分别是 8。转换为 16 进制分别是：0x08</li>
+<li>extra：长度分别是 16，转换为 16 进制分别是：0x10。</li>
+</ul>
+<p>倒序的顺序排列就是10 08</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">变长字段长度列表：10 08</span><br><span class="line">Null值列表：00</span><br><span class="line">记录头信息：00 00 10 00 47</span><br><span class="line">隐藏列DB_ROW_ID：00 00 00 00 08 0c</span><br><span class="line">隐藏列DB_TRX_ID：00 00 00 03 c9 4d</span><br><span class="line">隐藏列DB_ROLL_PTR：b9 00 00 01 2d 01 10</span><br><span class="line">列数据id(1)：80 00 00 00 00 00 00 01</span><br><span class="line">列数据score(78.5)：00 00 00 00 00 a0 53 40</span><br><span class="line">列数据name(hash)：68 61 73 68</span><br><span class="line">列数据content(wodetian)：77 6f 64 65 74 69 61 6e</span><br><span class="line">列数据extra(nidetiantadetian)：6e 69 64 65 74 69 61 6e 74 61 64 65 74 69 61 6e</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-1-3、redundant行格式"><a href="#3-1-3、redundant行格式" class="headerlink" title="3.1.3、redundant行格式"></a>3.1.3、redundant行格式</h3><p>这个是最古老的，最简单粗暴的行格式了，现在基本上已经不用了，因为占用空间最多，从而导致内存碎片化最严重，是最低效的行格式了。<br><img src="/2020/08/05/2020-08-05-mysql-innodb/innodb_redundant_%E8%A1%8C%E6%A0%BC%E5%BC%8F.png" alt="innodb_redundant_行格式"></p>
+<h2 id="3-2、innodb数据页结构"><a href="#3-2、innodb数据页结构" class="headerlink" title="3.2、innodb数据页结构"></a>3.2、innodb数据页结构</h2><p><code>页</code>的概念，是innodb管理存储空间的基本单位，一个页的大小一般是 <code>16KB</code>。可以理解是盛放记录的大盒子。</p>
+<h3 id="3-2-1、页的种类："><a href="#3-2-1、页的种类：" class="headerlink" title="3.2.1、页的种类："></a>3.2.1、页的种类：</h3><p>innodb为了不同的目的设计了许多不同类型的页，比如</p>
+<ul>
+<li>存放表空间头部信息的页</li>
+<li>存放 <code>insert buffer</code> 信息的页</li>
+<li>存放 <code>INODE</code> 信息的页</li>
+<li>存放 <code>undo</code> 日志信息的页</li>
+<li>存放记录的页 （数据页）</li>
+</ul>
+<h3 id="3-2-2、数据页结构"><a href="#3-2-2、数据页结构" class="headerlink" title="3.2.2、数据页结构"></a>3.2.2、数据页结构</h3><p>数据页代表的这块 16KB 大小的存储空间，可以划分为多个部分，不同部分有不同的功能，各个部分如图所示：<br><img src="/2020/08/05/2020-08-05-mysql-innodb/innodb_%E6%95%B0%E6%8D%AE%E9%A1%B5%E7%BB%93%E6%9E%84.png" alt="innodb_数据页结构"></p>
+<h4 id="3-2-2-1、File-header"><a href="#3-2-2-1、File-header" class="headerlink" title="3.2.2.1、File header"></a>3.2.2.1、File header</h4><p>文件头部，存放页的一些通用信息。</p>
+<p>常见的信息如下：</p>
+<ul>
+<li><strong>FIL_PAGE_OFFSET</strong><br>每一个页都有一个单独的页号，InnoDB 通过页号来唯一定位一个页。</li>
+<li><strong>FIL_PAGE_SPACE_OR_CHKSUM</strong><br>这个代表当前页面的校验和（checksum），每当一个页面在内存中修改了，在同步之前就要把它的校验和算出来。在一个页面被刷到磁盘的时候，首先被写入磁盘的就是这个 checksum。</li>
+<li><strong>FIL_PAGE_PREV 和 FIL_PAGE_NEXT</strong><br>通过 FIL_PAGE_PREV 和 FIL_PAGE_NEXT 将上一页和下一页连起来，就形成了一个双向链表。这样就通过一个双向链表把许许多多的页就都串联起来了，而无需这些页在物理上真正连着。</li>
+<li><strong>FIL_PAGE_TYPE</strong><br>这个代表当前页的类型，InnoDB 为了不同的目的而设计了许多种不同类型的页。<ul>
+<li><strong>数据页（Data Page）</strong>：用于存储实际的数据行。</li>
+<li><strong>索引页（Index Page）</strong>：用于存储索引信息，如主键索引或二级索引。</li>
+<li><strong>系统页（System Page）</strong>：包含系统表空间的一些元数据信息。</li>
+<li><strong>事务数据页（Transaction Data Page）</strong>：与事务处理相关的页。</li>
+<li><strong>插入缓冲页（Insert Buffer Page）</strong>：用于合并非聚集索引的插入操作。</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2020/08/05/2020-08-05-mysql-innodb/File_header.png" alt="File_header"><br>如图所示：数据页是有FIL_PAGE_PREV和FIL_PAGE_NEXT着两个属性的，所以所有的数据页其实是一个双向链表。</p>
+<h4 id="3-2-2-2、Page-Header"><a href="#3-2-2-2、Page-Header" class="headerlink" title="3.2.2.2、Page Header"></a>3.2.2.2、Page Header</h4><p>为了得到一个数据页中存储的记录的状态信息，比如本页中已经存储了多少条记录，第一条记录的地址是什么，页目录中存储了多少个槽等等，特意在页中定义了一个叫 Page Header的部分，是页的第二部分，占用固定的 56 个字节，专门存储各种状态信息。<br><img src="/2020/08/05/2020-08-05-mysql-innodb/page_header.png" alt="page_header"><br>数据页专有的一些信息</p>
+<ul>
+<li><strong>PAGE_LEVEL</strong><br>当前页在索引树中的位置，Ox00代表叶节点，叶节点总是在第0层</li>
+<li><strong>PAGE_N_HEAP</strong><br>本页中的记录的数量，包括最小记录（Infimum）和最大记录（Supremum）以及标记为删除（delete_mask=1）的记录</li>
+</ul>
+<h4 id="3-2-2-3、Infimum-supermum"><a href="#3-2-2-3、Infimum-supermum" class="headerlink" title="3.2.2.3、Infimum + supermum"></a>3.2.2.3、Infimum + supermum</h4><p>最小记录和最大记录：两个虚拟的行记录</p>
+<ul>
+<li>最大记录是这个数据页中逻辑上最大的记录，所有用户的记录都小于它。</li>
+<li>最小记录是数据页上最小的记录，所有用户记录都大于它。</li>
+</ul>
+<p>他们在数据页被创建的时候创建，而且不能被删除。引入他们主要是方便页内操作。</p>
+<h4 id="3-2-2-4、user-records-Free-space"><a href="#3-2-2-4、user-records-Free-space" class="headerlink" title="3.2.2.4、user records + Free space"></a>3.2.2.4、user records + Free space</h4><p>存储的记录会按照我们指定的 行格式 存储到 <code>User Records</code> 区域。</p>
+<p>但是在一开始生成页的时候，其实并没有 <code>User Records</code>区域，每当我们插入一条记录，都会从 <code>Free Space</code>（也就是尚未使用的存储空间）中申请一个记录大小的空间划分到<code>User Records</code>。</p>
+<p>当所有的 <code>Free Space</code> 使用完后，意味着这个页使用完了，如果插入新的数据，则需要去申请新的页了。</p>
+<h5 id="1-如何管理-User-Records中的记录"><a href="#1-如何管理-User-Records中的记录" class="headerlink" title="1. 如何管理 User Records中的记录"></a>1. 如何管理 <code>User Records</code>中的记录</h5><p>之前的innodb行格式章节中介绍了行记录的记录头信息，如下图：<br><img src="/2020/08/05/2020-08-05-mysql-innodb/innodb_%E8%A1%8C%E8%AE%B0%E5%BD%95_%E8%AE%B0%E5%BD%95%E5%A4%B4.png" alt="innodb_行记录_记录头"></p>
+<h6 id="delete-mask"><a href="#delete-mask" class="headerlink" title="delete_mask"></a>delete_mask</h6><ul>
+<li>这个属性标记着当前记录是否被删除，占用1个二进制位，值为 0 的时候代表记录并没有被删除，为 1 的时候代表记录被删除掉了。</li>
+<li>啥？被删除的记录还在 页 中么？是的，摆在台面上的和背地里做的可能大相径庭，你以为它删除了，可它还在真实的磁盘上。这些被删除的记录之所以不立即从磁盘上移除，是因为移除它们之后把其他的记录在磁盘上重新排列需要性能消耗，所以只是打一个删除标记而已，所有被删除掉的记录都会组成一个所谓的 垃圾链表，在这个链表中的记录占用的空间称之为 “可重用空间”，之后如果有新记录插入到表中的话，可能把这些被删除的记录占用的存储空间覆盖掉。</li>
+</ul>
+<h6 id="min-rec-mask"><a href="#min-rec-mask" class="headerlink" title="min_rec_mask"></a>min_rec_mask</h6><p>B+树的每层非叶子节点中最小记录都会添加该标记</p>
+<h6 id="heap-no"><a href="#heap-no" class="headerlink" title="heap_no"></a>heap_no</h6><p>这个属性表示当前记录在本页中的位置。</p>
+<h6 id="next-record"><a href="#next-record" class="headerlink" title="next_record"></a>next_record</h6><p>非常重要，表示从当前记录的真实数据到下一条记录的真实数据的地址偏移量。比方说第一条记录的next_record值为32，意味着从第一条记录的真实数据的地址处向后找32字节便是下一条记录的真实数据。<br><img src="/2020/08/05/2020-08-05-mysql-innodb/innodb_%E8%A1%8C%E8%AE%B0%E5%BD%95_%E9%93%BE%E8%A1%A8.png" alt="innodb_行记录_链表"><br>从图中可以看到，记录按照主键从小到大的顺序形成了一个单链表。最大记录的next_record=0，也就是说没有下一条记录了。</p>
+<blockquote>
+<p>tips：会不会觉得next_record这个指针有点儿怪，为啥要指向记录头信息和真实数据之间的位置呢？为啥不干脆指向整条记录的开头位置？也就是记录的额外信息开头的位置呢？<br>因为这个位置刚刚好，向左读取就是记录头信息，向右读取就是真实数据。可能会提高高速缓存的命中率。</p>
+</blockquote>
+<h4 id="3-2-2-5、Page-Directory【页目录】"><a href="#3-2-2-5、Page-Directory【页目录】" class="headerlink" title="3.2.2.5、Page Directory【页目录】"></a>3.2.2.5、Page Directory【页目录】</h4><h5 id="1-定义"><a href="#1-定义" class="headerlink" title="1. 定义"></a>1. 定义</h5><p>页目录, 用来辅助进行数据查找和定位的一种结构。</p>
+<p>从<code>3.2.2.4</code>章节中我们了解了记录在页中按照主键值由小到大顺序串联成了一个单链表，那如果我们想根据主键值查找页中的某条记录该咋办呢？</p>
+<p>比如查询语句 <code>select * from table where c1 = 3;</code><br>最笨的方法：从 Infimum 记录（最小记录）开始，沿着链表一直往后找，总有一天会找到。这个方法在页中存储的记录数量比较少的情况没啥问题，但是如果一个页中存储了非常多的记录，那么性能有损耗。</p>
+<p>优化：<br>平常我们想从一本书中查找某个内容，一般会先看目录，找对需要查找的内容对应的页码，然后到对应的页码查看内容。优化方向就是制作一个类似的目录。</p>
+<h5 id="1-工作原理"><a href="#1-工作原理" class="headerlink" title="1. 工作原理"></a>1. 工作原理</h5><p>槽（Slot）划分<br><img src="/2020/08/05/2020-08-05-mysql-innodb/page_directory.png" alt="page_directory"><br>Page Directory将数据页中的记录划分为若干个槽。每个槽（Slot）对应着页中的一组记录</p>
+<ul>
+<li>可以看到，页中的数据经过分组后在 Page Directory 中就形成了一个目录槽，每个槽就指向了分组中的最大记录，最大记录的记录头中的 n_owned 就记录了这个组中的记录数。</li>
+<li>有了目录槽之后，InnoDB就会利用二叉查找迅速确定记录所在的槽，并找到该槽所在分组中主键值最小的那条记录，再通过最小记录的 next_record 遍历记录，就能快速定位到匹配的那条记录了。</li>
+</ul>
+<h5 id="2-查找过程"><a href="#2-查找过程" class="headerlink" title="2. 查找过程"></a>2. 查找过程</h5><p>现在来看怎么从这个 “页目录” 中查找记录。</p>
+<p>上图中有4个槽，编号分别是0、1、2、3、4。比如说我们想找主键值为6的记录，过程是这样的：</p>
+<ol>
+<li>计算中间槽的位置：（0+4）/2=2，所以查找 槽2 对应的主键值为8，又因为 8&gt;6，所以设置 high=2，low保持不变。</li>
+<li>重新计算中间槽的位置：(0+2)/2=1，所以查看 槽1 对应的主键值为4， 又因为 4&lt;6，所以设置 low=1，high保持不变。</li>
+<li>因为 high-low=1，所以确定主键值为5的记录在 槽2 对应的组中。此刻我们需要找到 槽2 中主键值最小的那条记录，然后沿着单向链表遍历 槽2 中的记录。</li>
+</ol>
+<h4 id="3-2-2-6、数据页小结"><a href="#3-2-2-6、数据页小结" class="headerlink" title="3.2.2.6、数据页小结"></a>3.2.2.6、数据页小结</h4><ol>
+<li>每个数据页的File Header 部分都有上一个和下一个页的编号，所以所有的数据页会组成一个<strong>双向链表</strong>。</li>
+<li>每个记录的头信息中都有一个next_record属性，从而使页中的所有记录串联成一个 <strong>单链表</strong>。<ol>
+<li>为了提高单链表的查询效率，页中引入了 “page dictory（页目录）”，通过二分查找提高查询效率。</li>
+</ol>
+</li>
+<li></li>
+</ol>
+<h4 id="3-2-2-7、多个数据页如何查询"><a href="#3-2-2-7、多个数据页如何查询" class="headerlink" title="3.2.2.7、多个数据页如何查询"></a>3.2.2.7、多个数据页如何查询</h4><p>示例如下：B+树的叶子节点，组成一个双向链表<br><img src="/2020/08/05/2020-08-05-mysql-innodb/%E6%95%B0%E6%8D%AE%E9%A1%B5%E6%9F%A5%E8%AF%A2.png" alt="数据页查询"><br>如果我们要查找 ID=32 的这行数据，那流程是怎么样的呢？</p>
+<blockquote>
+<p>具体流程，查看后面的文章。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/02/2020-08-02-mysql-架构/" rel="next" title="《mysql》架构">
+                <i class="fa fa-chevron-left"></i> 《mysql》架构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/19/2020-10-19-交易账单/" rel="prev" title="交易账单">
+                交易账单 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/touxiang.jpg" alt="chw">
+            
+              <p class="site-author-name" itemprop="name">chw</p>
+              <p class="site-description motion-element" itemprop="description">do somthing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">117</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">84</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、mysql"><span class="nav-text">一、mysql</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、mysql存储引擎"><span class="nav-text">二、mysql存储引擎</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、innodb存储引擎"><span class="nav-text">三、innodb存储引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1、innodb行格式"><span class="nav-text">3.1、innodb行格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1、如何设置行格式？"><span class="nav-text">3.1.1、如何设置行格式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2、compact行格式"><span class="nav-text">3.1.2、compact行格式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-1、额外信息"><span class="nav-text">3.1.2.1、额外信息</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-变长字段长度表"><span class="nav-text">1. 变长字段长度表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-NUll值列表"><span class="nav-text">2. NUll值列表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-记录头信息"><span class="nav-text">3. 记录头信息</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-2、真实数据"><span class="nav-text">3.1.2.2、真实数据</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-隐藏列"><span class="nav-text">1. 隐藏列</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-3、示例："><span class="nav-text">3.1.2.3、示例：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-3、redundant行格式"><span class="nav-text">3.1.3、redundant行格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2、innodb数据页结构"><span class="nav-text">3.2、innodb数据页结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1、页的种类："><span class="nav-text">3.2.1、页的种类：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2、数据页结构"><span class="nav-text">3.2.2、数据页结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-1、File-header"><span class="nav-text">3.2.2.1、File header</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-2、Page-Header"><span class="nav-text">3.2.2.2、Page Header</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-3、Infimum-supermum"><span class="nav-text">3.2.2.3、Infimum + supermum</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-4、user-records-Free-space"><span class="nav-text">3.2.2.4、user records + Free space</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-如何管理-User-Records中的记录"><span class="nav-text">1. 如何管理 User Records中的记录</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#delete-mask"><span class="nav-text">delete_mask</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#min-rec-mask"><span class="nav-text">min_rec_mask</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#heap-no"><span class="nav-text">heap_no</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#next-record"><span class="nav-text">next_record</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-5、Page-Directory【页目录】"><span class="nav-text">3.2.2.5、Page Directory【页目录】</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-定义"><span class="nav-text">1. 定义</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-工作原理"><span class="nav-text">1. 工作原理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-查找过程"><span class="nav-text">2. 查找过程</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-6、数据页小结"><span class="nav-text">3.2.2.6、数据页小结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-7、多个数据页如何查询"><span class="nav-text">3.2.2.7、多个数据页如何查询</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chw</span>
+
+
+       <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
