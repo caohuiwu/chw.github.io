@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这是“mysql”系列的第三篇文章，主要介绍的是索引。一、mysqlMySQL 是一种广泛使用的开源关系型数据库管理系统（RDBMS–Relational Database Management System）">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《mysql》索引">
+<meta property="og:url" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/index.html">
+<meta property="og:site_name" content="CHW&#39;s Notes">
+<meta property="og:description" content="这是“mysql”系列的第三篇文章，主要介绍的是索引。一、mysqlMySQL 是一种广泛使用的开源关系型数据库管理系统（RDBMS–Relational Database Management System）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/%E7%B4%A2%E5%BC%95.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/%E7%B4%A2%E5%BC%95%E9%A1%B5_%E5%88%86%E8%A3%82.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/%E7%B4%A2%E5%BC%95%E9%A1%B5_%E5%A4%9A%E5%B1%82.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/%E7%B4%A2%E5%BC%95%E9%A1%B5_%E7%AE%80%E5%8C%96.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/icp_%E5%85%B3%E9%97%AD.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/icp_%E5%BC%80%E5%90%AF.png">
+<meta property="og:updated_time" content="2025-02-12T13:34:14.689Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《mysql》索引">
+<meta name="twitter:description" content="这是“mysql”系列的第三篇文章，主要介绍的是索引。一、mysqlMySQL 是一种广泛使用的开源关系型数据库管理系统（RDBMS–Relational Database Management System）">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/">
+
+
+
+
+
+  <title>《mysql》索引 | CHW's Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CHW's Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-fa fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/10/2020-08-10-mysql-索引/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chw">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/touxiang.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CHW's Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《mysql》索引</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-10T14:19:31+08:00">
+                2020-08-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/" itemprop="url" rel="index">
+                    <span itemprop="name">数据库</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据库/mysql/索引/" itemprop="url" rel="index">
+                    <span itemprop="name">索引</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3.2k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  11
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <pre><code>这是“mysql”系列的第三篇文章，主要介绍的是索引。</code></pre><h1 id="一、mysql"><a href="#一、mysql" class="headerlink" title="一、mysql"></a>一、mysql</h1><p><code>MySQL</code> 是一种广泛使用的开源关系型数据库管理系统（RDBMS–Relational Database Management System）</p>
+<a id="more"></a>
+<p>基本结构：<br><img src="/2020/08/10/2020-08-10-mysql-索引/%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84.png" alt="基本结构"></p>
+<h1 id="二、如果没有索引"><a href="#二、如果没有索引" class="headerlink" title="二、如果没有索引"></a>二、如果没有索引</h1><p>对某个列精确匹配查询，SQL如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from table where col1 = xxxx;</span><br></pre></td></tr></table></figure>
+
+<p>那这条SQL是怎么查询的呢？</p>
+<h2 id="2-1、在一个页中查找"><a href="#2-1、在一个页中查找" class="headerlink" title="2.1、在一个页中查找"></a>2.1、在一个页中查找</h2><p>假设目前表中的记录比较少，所以的记录都可以放到一个页中，在查找记录的时候可以根据搜索条件的不同分为两种情况：</p>
+<h3 id="2-1-1、以主键为搜索条件"><a href="#2-1-1、以主键为搜索条件" class="headerlink" title="2.1.1、以主键为搜索条件"></a>2.1.1、以主键为搜索条件</h3><p>在 “page Directory（页目录）”中使用二分法快速定位到对应的槽，然后再遍历该槽对应分组中的记录即可快速找到指定的记录。</p>
+<h3 id="2-1-2、以其他列作为搜索条件"><a href="#2-1-2、以其他列作为搜索条件" class="headerlink" title="2.1.2、以其他列作为搜索条件"></a>2.1.2、以其他列作为搜索条件</h3><p>对非主键列的查找过程可就不那么幸运了，因为在数据页中并没有对非主键列建立所谓的“page Directory（页目录）”，所以无法通过二分查找快速定位。</p>
+<p>这种情况下，只能从 “最小记录”开始，依次遍历单链表中的每条记录，然后对比每条记录是否符合搜索条件。很显然，这种查询效率非常低的。</p>
+<h2 id="2-2、在很多页中查找"><a href="#2-2、在很多页中查找" class="headerlink" title="2.2、在很多页中查找"></a>2.2、在很多页中查找</h2><p>大部分情况下，我们的表中存储的数据是非常多的，需要很多数据页来存储。</p>
+<p>在很多页中查找记录的话可以分为两个步骤：</p>
+<ol>
+<li>定位到记录所在的页。</li>
+<li>从所在的页内中查找相应的记录。</li>
+</ol>
+<p>在没有索引的情况下，不论是根据主键列或者是其他列的值进行查找，由于我们并不能快速的定位到记录所在的页，所以只能从第一个页沿着双向链表一直往下找，在每一个页中根据我们刚刚讲过的查找方式去查找指定的记录。</p>
+<p>因为要遍历所有的数据页，所以这种方式是超级耗时的。</p>
+<p>为了能够高效完成搜索，引入了“索引”。</p>
+<h1 id="三、innodb中的索引方案"><a href="#三、innodb中的索引方案" class="headerlink" title="三、innodb中的索引方案"></a>三、innodb中的索引方案</h1><p>innodb是怎么区分一条记录是普通的“用户记录”还是“目录项记录”呢？别忘了记录头信息里的<code>record_type</code>属性：</p>
+<ul>
+<li>0：普通用户记录</li>
+<li>1：目录项记录（索引）</li>
+<li>2：最小记录</li>
+<li>3：最大记录</li>
+</ul>
+<p>把使用到的目录项放到数据页中的样子如下：<br><img src="/2020/08/10/2020-08-10-mysql-索引/%E7%B4%A2%E5%BC%95.png" alt="索引"><br>从图中可以看出来，我们重新分配了一个编号为 30 的页来专门存储 “目录项记录”。这里再强调一遍“目录项记录”和“普通用户记录”的不同点：</p>
+<ul>
+<li>目录项记录<ul>
+<li>record_type=1。</li>
+<li>目录项记录只有“主键值”和“页的编号” 两个列。</li>
+</ul>
+</li>
+<li>普通用户记录<ul>
+<li>record_type=0</li>
+<li>普通用户记录的列是用户自己定义的，可能包含很多列，另外还有innodb自己添加的隐藏列。</li>
+</ul>
+</li>
+</ul>
+<p>除了上述几点外，这两者就没啥差别了，<font color="green"><strong>它们用的是一样的数据页（页面类型都是Ox45BF，这个属性在File Header中）</strong></font></p>
+<p>现在以查找主键为 20 的记录为例，根据某个主键值去查找记录的步骤就可以大致拆分成下边两步：</p>
+<ol>
+<li>先到存储“目录项记录”的页，也就是页 30 中通过二分法快速定位到对应目录项，因为 12&lt;20&lt;209，所以定位到对应的记录所在的页为 9.</li>
+<li>再到存储“用户记录”的 页9 中根据二分法快速定位到主键值为 20 的用户记录。</li>
+</ol>
+<p>“目录项记录”的页也只有 16KB，如果一个数据页存储不下，会再分配一个新“目录项记录”页。<br><img src="/2020/08/10/2020-08-10-mysql-索引/%E7%B4%A2%E5%BC%95%E9%A1%B5_%E5%88%86%E8%A3%82.png" alt="索引页_分裂"><br>如上图，插入一条主键值为320的用户记录，查询分配一个新的页，此时有两个新的数据页。</p>
+<p>如果数据量非常多，会为“存储目录项记录”的页生成一个更高级的目录，就像是一个多级目录一样，大目录里嵌套小目录，如下图：<br><img src="/2020/08/10/2020-08-10-mysql-索引/%E7%B4%A2%E5%BC%95%E9%A1%B5_%E5%A4%9A%E5%B1%82.png" alt="索引页_多层"></p>
+<p>简化一下，可以用下图来描述：<br><img src="/2020/08/10/2020-08-10-mysql-索引/%E7%B4%A2%E5%BC%95%E9%A1%B5_%E7%AE%80%E5%8C%96.png" alt="索引页_简化"><br>这个像树的结构，称为<font color="green"><strong>“B+树”</strong></font></p>
+<h2 id="3-1、聚簇索引"><a href="#3-1、聚簇索引" class="headerlink" title="3.1、聚簇索引"></a>3.1、聚簇索引</h2><p>上边介绍的 B+ 树本身就是一个目录，或者说本身就是一个索引。它有两个特点：</p>
+<ol>
+<li>使用记录主键值的大小进行记录和页的排序，这包括三方面的含义：<ol>
+<li>页内的记录是按照主键大小顺序排成一个单向链表。</li>
+<li>各个存放用户记录的页，也是根据页中用户记录的主键大小顺序排成一个双向链表。</li>
+<li>存放目录项记录的页分为不同的层次，同一层次中的页也是根据页中目录项记录的主键大小顺序排成一个双向链表。</li>
+</ol>
+</li>
+<li>B+ 树的叶子节点存储的是完整的用户记录。</li>
+</ol>
+<p>我们把具有这两种特性的 B+ 树称为“聚簇索引”，所有完整的用户记录都存放在这个“聚簇索引”的叶子节点处。</p>
+<p>在innodb存储引擎中，聚簇索引 就是数据的存储方式（所有的用户记录都存储在了 叶子节点），也就是所谓的索引即数据，数据即索引。</p>
+<h2 id="3-2、二级索引"><a href="#3-2、二级索引" class="headerlink" title="3.2、二级索引"></a>3.2、二级索引</h2><p>上边介绍的 “聚簇索引” 只能在搜索条件是主键值时才能发挥作用，因为 B+ 树的数据都是按照主键进行排序的。那如果我们想从别的列作为搜索条件该咋办？难道只能从头到尾沿着链表依次遍历记录吗？</p>
+<p>解决方案是可以多建几棵 B+ 树，不同的 B+ 树中的数据采用不同的排序规则。比如说我们用c2列的大小作为数据页、页中记录的排序规则，再建一棵 B+ 树，效果如下图：<br><img src="/2020/08/10/2020-08-10-mysql-索引/%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95.png" alt="二级索引"><br>这棵 B+ 树与上边介绍的聚簇索引有几处不同：</p>
+<ol>
+<li>二级索引叶子节点存储的不是完整的用户记录，而只是 “c2列 + 主键” 这两个列的值。</li>
+<li>目录项记录中不再是 “主键 + 页号”，而是变成了 “c2列 + 页号”。</li>
+</ol>
+<p>如果想通过c2列的值查找某条记录，则可以利用这个二级索引。以查找c2列的值为4的记录为例，查找过程如下：</p>
+<ol>
+<li>确定 “目录项记录” 页。</li>
+<li>通过 “目录项记录” 页确定用户记录真实所在的页。</li>
+<li>在真实存储用户记录的页中定位到具体的记录。（<font color="green"><strong>返回的是主键ID</strong></font>）</li>
+<li><font color="green"><strong>再根据主键值去“聚簇索引”中再查找一遍完整的用户记录</strong></font>。<font color="red"><strong>（简称回表）</strong></font></li>
+</ol>
+<h3 id="3-2-1、二级索引小结"><a href="#3-2-1、二级索引小结" class="headerlink" title="3.2.1、二级索引小结"></a>3.2.1、二级索引小结</h3><p>这种按照 “非主键列” 建立的 B+ 树需要一次 “回表”操作才可以定位到完整的用户记录，所以这种 B+ 树也被称为 “二级索引” 或者 “辅助索引”。</p>
+<h2 id="3-3、联合索引"><a href="#3-3、联合索引" class="headerlink" title="3.3、联合索引"></a>3.3、联合索引</h2><p>我们也可以同时以多个列的大小作为排序规则，也就是同时为多个列建立索引，比如说让 B+ 树按照 c2和c3列的大小进行排序，这个包含两层含义：</p>
+<ol>
+<li>先把各个记录和页按照 c2 列进行排序，在记录的 c2 列相同的情况下，采用 c3 列进行排序</li>
+</ol>
+<p><img src="/2020/08/10/2020-08-10-mysql-索引/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95.png" alt="联合索引"></p>
+<ul>
+<li>如图所示：每条 “目录项记录” 都由 “c2、c3、页号”这三个部分组成，各条记录先按 c2 列的值进行排序，如果记录的 c2 列相同，则按照 c3 列的值进行排序。</li>
+<li>B+ 树叶子节点处的用户记录由 “c2、c3、主键c1”组成。</li>
+</ul>
+<h2 id="3-4、覆盖索引"><a href="#3-4、覆盖索引" class="headerlink" title="3.4、覆盖索引"></a>3.4、覆盖索引</h2><p>为了彻底告别 “回表” 操作带来的性能损耗，我们建议：最好在查询列表里只包含索引列。比如这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select name, birthday, phone_number from person_info where name &gt; &apos;Asa&apos; and name &lt; &apos;Barlow&apos;;</span><br></pre></td></tr></table></figure>
+
+<p>因为我们只查询<code>name, birthday, phone_number</code>这三个索引列的值，所以在通过 <code>idx_name_birthday_phone_number</code> 索引得到结果后就不必到“聚簇索引”中再查找记录的剩余列。</p>
+<h1 id="四、索引下推（index-condition-pushdown）"><a href="#四、索引下推（index-condition-pushdown）" class="headerlink" title="四、索引下推（index condition pushdown）"></a>四、索引下推（index condition pushdown）</h1><p>索引下推（<code>INDEX CONDITION PUSHDOWN，简称 ICP</code>）是 MySQL 5.6 发布后针对<font color="green"><strong>扫描二级索引的一项优化改进</strong></font>。总的来说是通过<font color="red"><strong>把索引过滤条件下推到存储引擎</strong></font>，来减少 MySQL 存储引擎访问基表的次数以及 MySQL 服务层访问存储引擎的次数。<code>ICP</code> 适用于 <code>MYISAM</code> 和 <code>INNODB</code>。</p>
+<p>优点如下：</p>
+<ol>
+<li>减少了回表的操作次数。</li>
+<li>减少了上传到 MySQL SERVER 层的数据。</li>
+</ol>
+<p>接下来，详细看下不适用 ICP、使用 ICP 的详细示例来理清 ICP 的概念。</p>
+<h2 id="4-1、在不使用-ICP-索引扫描的过程："><a href="#4-1、在不使用-ICP-索引扫描的过程：" class="headerlink" title="4.1、在不使用 ICP 索引扫描的过程："></a>4.1、在不使用 ICP 索引扫描的过程：</h2><p>MySQL 存储引擎层只把满足索引键值对应的整行表记录一条一条取出，并且上传给 MySQL 服务层。</p>
+<p>MySQL 服务层对接收到的数据，使用 SQL 语句后面的 where 条件过滤，直到处理完最后一行记录，再一起返回给客户端。</p>
+<p>假设 SQL 语句为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(localhost)|&gt;select * from t1 where r1 = 1 and r2 like &apos;%dog%&apos; and r4 = 5\G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">id: 28965</span><br><span class="line">f1: 81</span><br><span class="line">f2: 89</span><br><span class="line">f3: 100</span><br><span class="line">f4: 35</span><br><span class="line">r1: 1</span><br><span class="line">r2: 12844bda dog 11ea a051 08002753f58d</span><br><span class="line">r3: 17</span><br><span class="line">r4: 5</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>关闭 ICP 的处理流程大概如图下：<br><img src="/2020/08/10/2020-08-10-mysql-索引/icp_%E5%85%B3%E9%97%AD.png" alt="icp_关闭"></p>
+<ul>
+<li>返回的数据，再由执行器进行过滤。</li>
+</ul>
+<h2 id="4-2、使用-ICP-扫描的过程："><a href="#4-2、使用-ICP-扫描的过程：" class="headerlink" title="4.2、使用 ICP 扫描的过程："></a>4.2、使用 ICP 扫描的过程：</h2><p>MySQL 存储引擎层，先根据过滤条件中包含的索引键确定索引记区间，再在这个区间的记录上使用包含索引键的其他过滤条件进行过滤，之后规避掉不满足的索引记录，只根据满足条件的索引记录回表取回数据上传到 MySQL 服务层。</p>
+<p>MySQL 服务层对接收到的数据，使用 where 子句中不包含索引列的过滤条件做最后的过滤，然后返回数据给客户端。</p>
+<p>如下图所示：<br><img src="/2020/08/10/2020-08-10-mysql-索引/icp_%E5%BC%80%E5%90%AF.png" alt="icp_开启"></p>
+<p>上面两张图很明显的对比出开启 ICP 比不开启 ICP 的效率。返回数据这一块虚线表示规避掉的记录，开启 ICP 很明显减少了上传到 MySQL 存储引擎层、MySQL 服务层的记录条数，节省了 IO。</p>
+<h1 id="五、索引跳跃扫描（index-skip-scan）"><a href="#五、索引跳跃扫描（index-skip-scan）" class="headerlink" title="五、索引跳跃扫描（index skip scan）"></a>五、索引跳跃扫描（index skip scan）</h1><p>MySQL 8.0.13开始支持，该优化方式<font color="green"><strong>支持那些SQL在不符合组合索引最左前缀的原则</strong></font>的情况，优化器依然能组使用组合索引。</p>
+<h2 id="5-1、索引跳跃扫描的原理"><a href="#5-1、索引跳跃扫描的原理" class="headerlink" title="5.1、索引跳跃扫描的原理"></a>5.1、索引跳跃扫描的原理</h2><p>索引跳跃扫描通过以下方式解决上述问题：</p>
+<ul>
+<li><strong>分解查询</strong>：将查询条件分解为多个子查询，每个子查询对应前导列的一个唯一值。</li>
+<li><strong>合并结果</strong>：将每个子查询的结果合并，得到最终结果。</li>
+</ul>
+<h3 id="5-1-1、分解查询"><a href="#5-1-1、分解查询" class="headerlink" title="5.1.1、分解查询"></a>5.1.1、分解查询</h3><p>当数据库引擎遇到一个查询，只指定了复合索引中非最左侧的字段（例如对于<code>索引 Index(A, B, C)</code>，查询条件为 WHERE B =?）时，Index Skip Scan 开始发挥作用</p>
+<p>数据库会根据索引最左侧的字段（A）的值将索引数据进行分组：</p>
+<ul>
+<li>假设 字段A 的值有如下4个唯一值：A1, A2, A3, A4</li>
+<li>将查询分解为4个子查询：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select * from table where A = A1 and B = ?;</span><br><span class="line">select * from table where A = A2 and B = ?;</span><br><span class="line">select * from table where A = A3 and B = ?;</span><br><span class="line">select * from table where A = A4 and B = ?;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>相当于跳过了对 A 字段的精确匹配要求，直接在不同的 A 值分组内根据 B 字段进行查找。</p>
+<h3 id="5-1-2、合并结果"><a href="#5-1-2、合并结果" class="headerlink" title="5.1.2、合并结果"></a>5.1.2、合并结果</h3><p>将4个子查询的结果合并，返回给客户端。</p>
+<h2 id="5-2、索引跳跃扫描的适用场景"><a href="#5-2、索引跳跃扫描的适用场景" class="headerlink" title="5.2、索引跳跃扫描的适用场景"></a>5.2、索引跳跃扫描的适用场景</h2><ul>
+<li><strong>复合索引的前导列基数较低</strong>：前导列的唯一值较少（例如性别、状态等）。</li>
+<li><strong>查询条件未使用前导列</strong>：查询条件只使用了复合索引的非前导列。</li>
+<li><strong>查询性能优于全表扫描</strong>：索引跳跃扫描的开销低于全表扫描。</li>
+</ul>
+<blockquote>
+<p>列的基数：指的是某一列中不重复数据的个数。比如说某个列包含值 2, 5, 8, 2, 5, 8, 2, 5, 8，虽然有9条数据，但是该列的基数却是3.</p>
+</blockquote>
+<h2 id="5-3、索引跳跃扫描的限制"><a href="#5-3、索引跳跃扫描的限制" class="headerlink" title="5.3、索引跳跃扫描的限制"></a>5.3、索引跳跃扫描的限制</h2><ul>
+<li><strong>前导列基数不能过高</strong>：如果前导列的唯一值过多，分解查询的开销会很大，导致性能下降。</li>
+<li><strong>索引选择性</strong>：如果非前导列的选择性较低（即满足条件的行数较多），索引跳跃扫描的效果可能不明显。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/05/2020-08-05-mysql-innodb/" rel="next" title="《mysql》innodb">
+                <i class="fa fa-chevron-left"></i> 《mysql》innodb
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/19/2020-10-19-交易账单/" rel="prev" title="交易账单">
+                交易账单 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/touxiang.jpg" alt="chw">
+            
+              <p class="site-author-name" itemprop="name">chw</p>
+              <p class="site-description motion-element" itemprop="description">do somthing</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">118</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">85</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、mysql"><span class="nav-text">一、mysql</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、如果没有索引"><span class="nav-text">二、如果没有索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1、在一个页中查找"><span class="nav-text">2.1、在一个页中查找</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1、以主键为搜索条件"><span class="nav-text">2.1.1、以主键为搜索条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2、以其他列作为搜索条件"><span class="nav-text">2.1.2、以其他列作为搜索条件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2、在很多页中查找"><span class="nav-text">2.2、在很多页中查找</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、innodb中的索引方案"><span class="nav-text">三、innodb中的索引方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1、聚簇索引"><span class="nav-text">3.1、聚簇索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2、二级索引"><span class="nav-text">3.2、二级索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1、二级索引小结"><span class="nav-text">3.2.1、二级索引小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3、联合索引"><span class="nav-text">3.3、联合索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4、覆盖索引"><span class="nav-text">3.4、覆盖索引</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、索引下推（index-condition-pushdown）"><span class="nav-text">四、索引下推（index condition pushdown）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1、在不使用-ICP-索引扫描的过程："><span class="nav-text">4.1、在不使用 ICP 索引扫描的过程：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2、使用-ICP-扫描的过程："><span class="nav-text">4.2、使用 ICP 扫描的过程：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#五、索引跳跃扫描（index-skip-scan）"><span class="nav-text">五、索引跳跃扫描（index skip scan）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1、索引跳跃扫描的原理"><span class="nav-text">5.1、索引跳跃扫描的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-1、分解查询"><span class="nav-text">5.1.1、分解查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-2、合并结果"><span class="nav-text">5.1.2、合并结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2、索引跳跃扫描的适用场景"><span class="nav-text">5.2、索引跳跃扫描的适用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3、索引跳跃扫描的限制"><span class="nav-text">5.3、索引跳跃扫描的限制</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chw</span>
+
+
+       <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
